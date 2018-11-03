@@ -2,8 +2,19 @@
 <html>
     <head>
         <script src="socket.js"></script>
+        <script src="clientws.js" defer></script>
     </head>
     <body>
-        Hello world
+        <div>
+            Action sender
+            <form>
+                <textarea name="message" ></textarea>
+                <input type="submit">
+            </form>
+        </div>
+        <div>
+            Results
+            <div id="results"></div>
+        </div>
     </body>
 </html>
