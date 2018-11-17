@@ -6,11 +6,7 @@ import (
 )
 
 func main() {
-
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		serveWS(w, r)
-	})
-
+	http.HandleFunc("/ws", serveWS)
 	http.Handle("/", http.FileServer(http.Dir("./static")))
 
 	err := http.ListenAndServe(":8080", nil)

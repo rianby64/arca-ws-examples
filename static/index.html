@@ -17,4 +17,17 @@
             <div id="results"></div>
         </div>
     </body>
+    <script>
+        'use strict';
+        document.querySelector('[name="message"]').value = JSON.stringify(
+        {
+            jsonrpc: "2.0",
+            method: "mymethod",
+            params: {
+                message: "my param a",
+                a: ["this is A", "this b"]
+            },
+            id: "my id"
+        });
+    </script>
 </html>
