@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -32,34 +31,36 @@ func serveWS(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for {
-		messageType, data, err := conn.ReadMessage()
+		log.Println("begin loop")
+		var request JSONRPCrequest
+		err := conn.ReadJSON(&request)
 		if err != nil {
-			log.Println("reading", err)
+			log.Println("Error", err)
 			return
 		}
 
-		log.Println("received:", string(data))
-		var request JSONRPCrequest
-		if err := json.Unmarshal(data, &request); err != nil {
-			log.Println(err)
-		} else if err := conn.WriteMessage(messageType, data); err != nil {
-			log.Println("sending", err)
-		}
-
-		log.Println(request.ID, request.Jsonrpc, request.Method, request.Params)
-		var params MyParams
-
-		preA := request.Params["A"].([]interface{})
-
-		params.Message = request.Params["Message"].(string)
-		params.A = make([]string, len(preA))
-
-		for key, value := range preA {
-			params.A[key] = value.(string)
-		}
-
-		log.Println(params)
+		processRequest(&request, conn)
 
 		log.Println("end loop")
+	}
+}
+
+func processRequest(request *JSONRPCrequest, conn *websocket.Conn) {
+
+	log.Println(request.ID, request.Jsonrpc, request.Method, request.Params)
+	var params MyParams
+
+	preA := request.Params["A"].([]interface{})
+
+	params.Message = request.Params["Message"].(string)
+	params.A = make([]string, len(preA))
+
+	for key, value := range preA {
+		params.A[key] = value.(string)
+	}
+
+	err := conn.WriteJSON(request)
+	if err != nil {
+		log.Println("sending", err)
 	}
 }

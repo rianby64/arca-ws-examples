@@ -2,32 +2,8 @@
 <html>
     <head>
         <script src="socket.js"></script>
-        <script src="clientws.js" defer></script>
+        <script src="simple-table.js"></script>
     </head>
     <body>
-        <div>
-            Action sender
-            <form>
-                <textarea name="message" ></textarea>
-                <input type="submit">
-            </form>
-        </div>
-        <div>
-            Results
-            <div id="results"></div>
-        </div>
     </body>
-    <script>
-        'use strict';
-        document.querySelector('[name="message"]').value = JSON.stringify(
-        {
-            jsonrpc: "2.0",
-            method: "mymethod",
-            params: {
-                message: "my param a",
-                a: ["this is A", "this b"]
-            },
-            id: "my id"
-        });
-    </script>
 </html>
