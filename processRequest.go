@@ -33,10 +33,10 @@ func processRequest(request *JSONRPCrequest, conn *websocket.Conn) error {
 	var params MyParams
 
 	// I'd like to use .(Object) instead of that long definition. How to proceed?
-	// message, ok := request.Params.(map[string]interface{})["Message"]
+	// message, ok := request.Params.(Object)["Message"]
 
 	// extract Message
-	message, ok := request.Params.(Object)["Message"]
+	message, ok := request.Params.(map[string]interface{})["Message"]
 	if !ok {
 		return errorMyParams{"Error while converting Message"}
 	}
