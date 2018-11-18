@@ -12,20 +12,6 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-// MyParams whatever
-type MyParams struct {
-	Message string
-	A       []string
-}
-
-type errorMyParams struct {
-	why string
-}
-
-func (e errorMyParams) Error() string {
-	return e.why
-}
-
 // is for serving WS
 func serveWS(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -47,36 +33,7 @@ func serveWS(w http.ResponseWriter, r *http.Request) {
 
 		if err := processRequest(&request, conn); err != nil {
 			log.Println(err)
+			return
 		}
 	}
-}
-
-func processRequest(request *JSONRPCrequest, conn *websocket.Conn) error {
-
-	var params MyParams
-
-	// extract Message
-	message, ok := request.Params["Message"]
-	if !ok {
-		return errorMyParams{"Error while converting Message"}
-	}
-	params.Message = message.(string)
-
-	// Extract A
-	preA, ok := request.Params["A"].([]interface{})
-	if !ok {
-		return errorMyParams{"Error while converting A"}
-	}
-	params.A = make([]string, len(preA))
-	for key, value := range preA {
-		conv, ok := value.(string)
-		if !ok {
-			return errorMyParams{"Error while converting A member"}
-		}
-
-		params.A[key] = conv
-	}
-
-	// Echo
-	return conn.WriteJSON(request)
 }

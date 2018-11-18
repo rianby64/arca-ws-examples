@@ -4,21 +4,21 @@ package main
 type JSONRPCerror struct {
 	Code    int
 	Message string
-	Data    map[string]interface{}
+	Data    interface{}
 }
 
 // JSONRPCrequest is the structure of JSON-RPC request
 type JSONRPCrequest struct {
 	Jsonrpc string
 	Method  string
-	Params  map[string]interface{}
+	Params  interface{}
 	ID      string
 }
 
 // JSONRPCresponse is the structure of JSON-RPC response
 type JSONRPCresponse struct {
 	Jsonrpc string
-	Result  map[string]interface{}
-	Error   JSONRPCerror
+	Result  interface{}
+	Error   interface{}
 	ID      string
 }
