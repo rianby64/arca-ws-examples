@@ -18,6 +18,14 @@ type MyParams struct {
 	A       []string
 }
 
+type errorMyParams struct {
+	why string
+}
+
+func (e errorMyParams) Error() string {
+	return e.why
+}
+
 // is for serving WS
 func serveWS(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -31,36 +39,44 @@ func serveWS(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for {
-		log.Println("begin loop")
 		var request JSONRPCrequest
-		err := conn.ReadJSON(&request)
-		if err != nil {
-			log.Println("Error", err)
+		if err := conn.ReadJSON(&request); err != nil {
+			log.Println(err)
 			return
 		}
 
-		processRequest(&request, conn)
-
-		log.Println("end loop")
+		if err := processRequest(&request, conn); err != nil {
+			log.Println(err)
+		}
 	}
 }
 
-func processRequest(request *JSONRPCrequest, conn *websocket.Conn) {
+func processRequest(request *JSONRPCrequest, conn *websocket.Conn) error {
 
-	log.Println(request.ID, request.Jsonrpc, request.Method, request.Params)
 	var params MyParams
 
-	preA := request.Params["A"].([]interface{})
+	// extract Message
+	message, ok := request.Params["Message"]
+	if !ok {
+		return errorMyParams{"Error while converting Message"}
+	}
+	params.Message = message.(string)
 
-	params.Message = request.Params["Message"].(string)
+	// Extract A
+	preA, ok := request.Params["A"].([]interface{})
+	if !ok {
+		return errorMyParams{"Error while converting A"}
+	}
 	params.A = make([]string, len(preA))
-
 	for key, value := range preA {
-		params.A[key] = value.(string)
+		conv, ok := value.(string)
+		if !ok {
+			return errorMyParams{"Error while converting A member"}
+		}
+
+		params.A[key] = conv
 	}
 
-	err := conn.WriteJSON(request)
-	if err != nil {
-		log.Println("sending", err)
-	}
+	// Echo
+	return conn.WriteJSON(request)
 }
