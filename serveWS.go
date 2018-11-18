@@ -15,8 +15,8 @@ var upgrader = websocket.Upgrader{
 
 // MyParams whatever
 type MyParams struct {
-	message string
-	a       []string
+	Message string
+	A       []string
 }
 
 // is for serving WS
@@ -38,6 +38,7 @@ func serveWS(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		log.Println("received:", string(data))
 		var request JSONRPCrequest
 		if err := json.Unmarshal(data, &request); err != nil {
 			log.Println(err)
@@ -48,13 +49,13 @@ func serveWS(w http.ResponseWriter, r *http.Request) {
 		log.Println(request.ID, request.Jsonrpc, request.Method, request.Params)
 		var params MyParams
 
-		preA := request.Params["a"].([]interface{})
+		preA := request.Params["A"].([]interface{})
 
-		params.message = request.Params["message"].(string)
-		params.a = make([]string, len(preA))
+		params.Message = request.Params["Message"].(string)
+		params.A = make([]string, len(preA))
 
 		for key, value := range preA {
-			params.a[key] = value.(string)
+			params.A[key] = value.(string)
 		}
 
 		log.Println(params)
