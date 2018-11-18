@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"testing"
-	"time"
 
 	"github.com/gorilla/websocket"
 )
@@ -23,10 +22,9 @@ type MyRequest struct {
 }
 
 func Test_cli(t *testing.T) {
-	println("let's begin")
 	go main()
+	println("let's begin")
 
-	time.Sleep(time.Second * 2)
 	println("here we go")
 
 	c, _, err := websocket.DefaultDialer.Dial("ws://localhost:8080/ws", nil)
@@ -57,7 +55,7 @@ func Test_cli(t *testing.T) {
 	if err != nil {
 		println("Error at reading", err)
 	}
-	println(string(data))
+	println(string(data), "WHAT?")
 
 	println("now its over")
 }
