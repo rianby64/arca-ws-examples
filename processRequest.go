@@ -18,6 +18,7 @@ func (e errorMyParams) Error() string {
 
 // Person whatever
 type Person struct {
+	ID    int
 	Name  string
 	Email string
 }
@@ -61,9 +62,9 @@ func processRequest(request *JSONRPCrequest, conn *websocket.Conn) error {
 	myResponse.ID = "responseID"
 	myResponse.Jsonrpc = "2.0"
 	myResponse.Result = People{
-		Person{"Bob", "bob@mail.com"},
-		Person{"Jeff", "jeff@mail.com"},
-		Person{"Alice", "alice@mail.com"},
+		Person{1, "Bob", "bob@mail.com"},
+		Person{2, "Jeff", "jeff@mail.com"},
+		Person{3, "Alice", "alice@mail.com"},
 	}
 
 	// Echo
