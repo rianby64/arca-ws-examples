@@ -3,7 +3,7 @@ conn.onopen = () => {
     const message = {
         Jsonrpc: '2.0',
         Method: 'getUsers',
-        id: 'id-1'
+        ID: 'whatever'
     };
     conn.send(JSON.stringify(message));
 }

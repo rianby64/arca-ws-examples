@@ -1,6 +1,7 @@
 'use strict';
 const conn = new WebSocket("ws://" + document.location.host + "/ws");
 
+// Need to implement some Redux here in this thing...
 (() => {
     const table = document.querySelector('#mytable');
     const tbody = document.querySelector('tbody');

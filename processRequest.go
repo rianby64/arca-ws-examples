@@ -16,6 +16,7 @@ type Person struct {
 // People whatever
 type People []Person
 
+// This is my Data-Base!
 var people = People{
 	Person{1, "Bob", "bob@mail.com"},
 	Person{2, "Jeff", "jeff@mail.com"},
@@ -33,7 +34,6 @@ func response(request *JSONRPCrequest, conn *websocket.Conn, result interface{})
 }
 
 func processRequest(request *JSONRPCrequest, conn *websocket.Conn) error {
-
 	if request.Method == "getUsers" {
 		return response(request, conn, people)
 	}
