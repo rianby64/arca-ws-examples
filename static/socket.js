@@ -40,7 +40,9 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
                 Method: 'updateUser',
                 Params: new FormData(e.target).toJSON()
             };
-            console.log(fd);
+            fd.Params.ID = Number(fd.Params.ID);
+            span.textContent = fd.Params[key] ? fd.Params[key] : '-';
+            conn.send(JSON.stringify(fd));
         });
 
         row.querySelector(`[key="${key}"]`).appendChild(cell);

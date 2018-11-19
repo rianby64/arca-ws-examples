@@ -1,20 +1,10 @@
 package main
 
-import "github.com/gorilla/websocket"
+import (
+	"errors"
 
-// MyParams whatever
-type MyParams struct {
-	Message string
-	A       []string
-}
-
-type errorMyParams struct {
-	why string
-}
-
-func (e errorMyParams) Error() string {
-	return e.why
-}
+	"github.com/gorilla/websocket"
+)
 
 // Person whatever
 type Person struct {
@@ -26,47 +16,46 @@ type Person struct {
 // People whatever
 type People []Person
 
-// Object whatever
-type Object map[string]interface{}
+var people = People{
+	Person{1, "Bob", "bob@mail.com"},
+	Person{2, "Jeff", "jeff@mail.com"},
+	Person{3, "Alice", "alice@mail.com"},
+}
 
-func processRequest(request *JSONRPCrequest, conn *websocket.Conn) error {
-
-	var params MyParams
-
-	// I'd like to use .(Object) instead of that long definition. How to proceed?
-	// message, ok := request.Params.(Object)["Message"]
-
-	// extract Message
-	message, ok := request.Params.(map[string]interface{})["Message"]
-	if !ok {
-		return errorMyParams{"Error while converting Message"}
-	}
-	params.Message = message.(string)
-
-	// Extract A
-	preA, ok := request.Params.(map[string]interface{})["A"].([]interface{})
-	if !ok {
-		return errorMyParams{"Error while converting A"}
-	}
-	params.A = make([]string, len(preA))
-	for key, value := range preA {
-		conv, ok := value.(string)
-		if !ok {
-			return errorMyParams{"Error while converting A member"}
-		}
-
-		params.A[key] = conv
-	}
-
+func response(request *JSONRPCrequest, conn *websocket.Conn, result interface{}) error {
 	var myResponse JSONRPCresponse
 	myResponse.ID = "responseID"
 	myResponse.Jsonrpc = "2.0"
-	myResponse.Result = People{
-		Person{1, "Bob", "bob@mail.com"},
-		Person{2, "Jeff", "jeff@mail.com"},
-		Person{3, "Alice", "alice@mail.com"},
-	}
+	myResponse.Result = result
 
 	// Echo
 	return conn.WriteJSON(myResponse)
+}
+
+func processRequest(request *JSONRPCrequest, conn *websocket.Conn) error {
+
+	if request.Method == "getUsers" {
+		return response(request, conn, people)
+	}
+	if request.Method == "updateUser" {
+		params := request.Params.(map[string]interface{})
+		preid, ok := params["ID"]
+		if !ok {
+			return errors.New("params in request doesn't contain ID")
+		}
+
+		id := int(preid.(float64))
+		for index, person := range people {
+			if person.ID == id {
+				if email, ok := params["Email"]; ok {
+					people[index].Email = email.(string)
+				}
+				if name, ok := params["Name"]; ok {
+					people[index].Name = name.(string)
+				}
+				return response(request, conn, people[index])
+			}
+		}
+	}
+	return nil
 }
