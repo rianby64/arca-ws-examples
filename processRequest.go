@@ -23,9 +23,12 @@ var people = People{
 	Person{3, "Alice", "alice@mail.com"},
 }
 
-func response(request *JSONRPCrequest, conn *websocket.Conn, result interface{}) error {
+func response(request *JSONRPCrequest, conn *websocket.Conn,
+	result interface{}, id *string) error {
 	var myResponse JSONRPCresponse
-	myResponse.ID = "responseID"
+	if id != nil {
+		myResponse.ID = *id
+	}
 	myResponse.Jsonrpc = "2.0"
 	myResponse.Result = result
 
@@ -35,7 +38,8 @@ func response(request *JSONRPCrequest, conn *websocket.Conn, result interface{})
 
 func processRequest(request *JSONRPCrequest, conn *websocket.Conn) error {
 	if request.Method == "getUsers" {
-		return response(request, conn, people)
+		id := request.ID
+		return response(request, conn, people, &id)
 	}
 	if request.Method == "updateUser" {
 		params := request.Params.(map[string]interface{})
@@ -53,7 +57,7 @@ func processRequest(request *JSONRPCrequest, conn *websocket.Conn) error {
 				if name, ok := params["Name"]; ok {
 					people[index].Name = name.(string)
 				}
-				return response(request, conn, people[index])
+				return response(request, conn, people[index], nil)
 			}
 		}
 	}

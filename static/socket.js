@@ -10,6 +10,7 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
     const tmplCell = document.querySelector('[id="cell"]');
 
     const processCell = (row, key, data) => {
+        const td = row.querySelector(`[key="${key}"]`);
         const cell = document.importNode(tmplCell.content, true);
         const span = cell.querySelector('span');
         const input = cell.querySelector('input');
@@ -32,12 +33,11 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
             span.hidden = false;
             form.hidden = true;
 
-            span.classList.add('disabled');
+            td.setAttribute('disabled', '');
             span.removeEventListener('click', toggleSpanToForm);
 
             const fd = {
                 Jsonrpc: "2.0",
-                Id: 'whatever',
                 Method: 'updateUser',
                 Params: new FormData(e.target).toJSON()
             };
@@ -46,11 +46,12 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
             conn.send(JSON.stringify(fd));
         });
 
-        row.querySelector(`[key="${key}"]`).appendChild(cell);
+        td.appendChild(cell);
     };
 
     const processRow = (data) => {
         const row = document.importNode(tmplRow.content, true);
+        row.querySelector('tr').setAttribute('ID', data.ID)
         processCell(row, 'Name', data);
         processCell(row, 'Email', data);
         return row;
@@ -64,11 +65,26 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
         insertButton.insertingNew = true;
     });
 
-    function onmessage(e) {
+    conn.onmessage = (e) => {
         const data = JSON.parse(e.data);
         const result = data.Result;
-        result.forEach(element => tbody.appendChild(processRow(element)));
+        if (data.ID === 'id-for-getUsers') {
+            result.forEach(element => tbody.appendChild(processRow(element)));
+        } else {
+            const row = tbody.querySelector(`tr[id="${result.ID}"]`);
+            const cell = row.querySelector('[disabled]');
+            const key = cell.getAttribute('key');
+            cell.innerHTML = '';
+            cell.removeAttribute('disabled');
+            processCell(row, key, result);
+        }
     }
-
-    conn.onmessage = onmessage;
+    conn.onopen = () => {
+        const message = {
+            Jsonrpc: '2.0',
+            Method: 'getUsers',
+            ID: 'id-for-getUsers'
+        };
+        conn.send(JSON.stringify(message));
+    }
 })();
