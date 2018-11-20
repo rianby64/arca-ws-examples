@@ -22,6 +22,7 @@ var people = People{
 	Person{2, "Jeff", "jeff@mail.com"},
 	Person{3, "Alice", "alice@mail.com"},
 }
+var lastID = len(people)
 
 func response(request *JSONRPCrequest, conn *websocket.Conn,
 	result interface{}, id *string) error {
@@ -53,8 +54,12 @@ func processRequest(request *JSONRPCrequest, conn *websocket.Conn) error {
 		if !ok {
 			return errors.New("params in request doesn't contain ID")
 		}
+		preid2, ok := preid.(float64)
+		if !ok {
+			return errors.New("ID in params isn't int")
+		}
 
-		id := int(preid.(float64))
+		id := int(preid2)
 		for index, person := range people {
 			if person.ID == id {
 				if email, ok := params["Email"]; ok {
@@ -66,6 +71,19 @@ func processRequest(request *JSONRPCrequest, conn *websocket.Conn) error {
 				return response(request, conn, people[index], nil)
 			}
 		}
+	}
+	if request.Method == "insertUser" {
+		params := request.Params.(map[string]interface{})
+		lastID++
+		newPerson := Person{ID: lastID}
+		if email, ok := params["Email"]; ok {
+			newPerson.Email = email.(string)
+		}
+		if name, ok := params["Name"]; ok {
+			newPerson.Name = name.(string)
+		}
+		people = append(people, newPerson)
+		return response(request, conn, newPerson, nil)
 	}
 	return nil
 }

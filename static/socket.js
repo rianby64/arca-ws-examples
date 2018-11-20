@@ -36,13 +36,25 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
             td.setAttribute('disabled', '');
             span.removeEventListener('click', toggleSpanToForm);
 
-            const fd = {
-                Jsonrpc: "2.0",
-                Method: 'updateUser',
-                Params: new FormData(e.target).toJSON()
-            };
-            fd.Params.ID = Number(fd.Params.ID);
-            span.textContent = fd.Params[key] ? fd.Params[key] : '-';
+            let fd;
+            const data = new FormData(e.target).toJSON();
+            if (data.ID !== "undefined") {
+                data.ID = Number(data.ID);
+                span.textContent = data[key] ? data[key] : '-';
+
+                fd = {
+                    Jsonrpc: "2.0",
+                    Method: 'updateUser',
+                    Params: data
+                };
+            } else {
+                //data.ID = null;
+                fd = {
+                    Jsonrpc: "2.0",
+                    Method: 'insertUser',
+                    Params: data
+                };
+            }
             conn.send(JSON.stringify(fd));
         });
 
@@ -70,7 +82,15 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
         if (data.ID === 'id-for-getUsers') {
             result.forEach(element => tbody.appendChild(processRow(element)));
         } else {
-            const row = tbody.querySelector(`tr[id="${result.ID}"]`);
+            let row = tbody.querySelector(`tr[id="${result.ID}"]`);
+            if (!row) {
+                row = tbody.querySelector(`tr[id="undefined"]`);
+                if (!row) {
+                    return tbody.appendChild(processRow(result));
+                }
+                row.setAttribute('ID', result.ID)
+                insertButton.insertingNew = false;
+            }
             Object.keys(result).filter(key => key != 'ID').forEach(key => {
                 const cell = row.querySelector(`[key="${key}"]`);
                 cell.innerHTML = '';
