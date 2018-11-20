@@ -54,7 +54,11 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
                     Params: data
                 };
             }
-            conn.send(JSON.stringify(fd));
+            conn.send(JSON.stringify({...fd, 
+                context: {
+                    table: 'Users'
+                }
+            }));
         });
 
         td.appendChild(cell);
@@ -64,15 +68,21 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
         row.querySelector('tr').setAttribute('ID', data.ID)
         processCell(row, 'Name', data);
         processCell(row, 'Email', data);
-        row.querySelector('[action="delete"]').addEventListener('click', () => {
-            conn.send(JSON.stringify({
-                Jsonrpc: "2.0",
-                Method: 'deleteUser',
-                Params: {
-                    ID: data.ID
-                }
-            }));
-        });
+        row.querySelector('[action="delete"]').addEventListener('click', e => {
+            const id = Number(e.target.closest('tr').getAttribute('ID'));
+            if (id > 0) {
+                conn.send(JSON.stringify({
+                    Jsonrpc: "2.0",
+                    Method: 'deleteUser',
+                    Params: {
+                        ID: id
+                    },
+                    context: {
+                        table: 'Users'
+                    }
+                }));
+            }
+        }, { once: true });
         return row;
     }
 
@@ -87,6 +97,13 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
     conn.onmessage = (e) => {
         const data = JSON.parse(e.data);
         const result = data.Result;
+        if (data.Method === 'deleteUser') {
+            let row = tbody.querySelector(`tr[id="${result.ID}"]`);
+            if (row) {
+                row.remove();
+            }
+            return
+        }
         if (data.ID === 'id-for-getUsers') {
             result.forEach(element => tbody.appendChild(processRow(element)));
         } else {
@@ -111,7 +128,10 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
         const message = {
             Jsonrpc: '2.0',
             Method: 'getUsers',
-            ID: 'id-for-getUsers'
+            ID: 'id-for-getUsers',
+            context: {
+                table: 'Users'
+            }
         };
         conn.send(JSON.stringify(message));
     }

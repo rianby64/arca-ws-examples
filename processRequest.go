@@ -4,10 +4,18 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// JSONRPCContainer whatever
+type JSONRPCContainer struct {
+	Method string
+	ID     string
+}
+
 func response(request *JSONRPCrequest, conn *websocket.Conn,
 	result interface{}, id *string) error {
 	var myResponse JSONRPCresponse
 	myResponse.Jsonrpc = "2.0"
+	myResponse.Context = request.Context
+	myResponse.Method = request.Method
 	myResponse.Result = result
 
 	// response
@@ -32,6 +40,9 @@ func processRequest(request *JSONRPCrequest, conn *websocket.Conn) error {
 	}
 	if request.Method == "insertUser" {
 		return insertUser(request, conn)
+	}
+	if request.Method == "deleteUser" {
+		return deleteUser(request, conn)
 	}
 	return nil
 }

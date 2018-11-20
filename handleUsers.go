@@ -68,3 +68,25 @@ func insertUser(request *JSONRPCrequest, conn *websocket.Conn) error {
 	people = append(people, newPerson)
 	return response(request, conn, newPerson, nil)
 }
+
+func deleteUser(request *JSONRPCrequest, conn *websocket.Conn) error {
+	params := request.Params.(map[string]interface{})
+	preid, ok := params["ID"]
+	if !ok {
+		return errors.New("params in request doesn't contain ID")
+	}
+	preid2, ok := preid.(float64)
+	if !ok {
+		return errors.New("ID in params isn't int")
+	}
+
+	id := int(preid2)
+	deletedPerson := Person{ID: id}
+	for i, person := range people {
+		if person.ID == id {
+			people = append(people[:i], people[i+1:]...)
+			return response(request, conn, deletedPerson, nil)
+		}
+	}
+	return nil
+}
