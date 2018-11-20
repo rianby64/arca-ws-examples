@@ -26,14 +26,20 @@ var people = People{
 func response(request *JSONRPCrequest, conn *websocket.Conn,
 	result interface{}, id *string) error {
 	var myResponse JSONRPCresponse
-	if id != nil {
-		myResponse.ID = *id
-	}
 	myResponse.Jsonrpc = "2.0"
 	myResponse.Result = result
 
-	// Echo
-	return conn.WriteJSON(myResponse)
+	// response
+	if id != nil {
+		myResponse.ID = *id
+		return conn.WriteJSON(myResponse)
+	}
+
+	// broadcast
+	for _, connection := range conns {
+		connection.WriteJSON(myResponse)
+	}
+	return nil
 }
 
 func processRequest(request *JSONRPCrequest, conn *websocket.Conn) error {
