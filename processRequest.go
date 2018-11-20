@@ -4,12 +4,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// JSONRPCContainer whatever
-type JSONRPCContainer struct {
-	Method string
-	ID     string
-}
-
 func response(request *JSONRPCrequest, conn *websocket.Conn,
 	result interface{}, id *string) error {
 	var myResponse JSONRPCresponse
