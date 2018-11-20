@@ -64,7 +64,7 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
         row.querySelector('tr').setAttribute('ID', data.ID)
         processCell(row, 'Name', data);
         processCell(row, 'Email', data);
-        row.querySelector('action="delete"').addEventListener('click', () => {
+        row.querySelector('[action="delete"]').addEventListener('click', () => {
             conn.send(JSON.stringify({
                 Jsonrpc: "2.0",
                 Method: 'deleteUser',
