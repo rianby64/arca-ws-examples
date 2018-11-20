@@ -38,7 +38,7 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
 
             let fd;
             const data = new FormData(e.target).toJSON();
-            if (data.ID !== "undefined") {
+            if (Number(data.ID) > 0) {
                 data.ID = Number(data.ID);
                 span.textContent = data[key] ? data[key] : '-';
 
@@ -48,7 +48,6 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
                     Params: data
                 };
             } else {
-                //data.ID = null;
                 fd = {
                     Jsonrpc: "2.0",
                     Method: 'insertUser',
@@ -65,6 +64,15 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
         row.querySelector('tr').setAttribute('ID', data.ID)
         processCell(row, 'Name', data);
         processCell(row, 'Email', data);
+        row.querySelector('action="delete"').addEventListener('click', () => {
+            conn.send(JSON.stringify({
+                Jsonrpc: "2.0",
+                Method: 'deleteUser',
+                Params: {
+                    ID: data.ID
+                }
+            }));
+        });
         return row;
     }
 
