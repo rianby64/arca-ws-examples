@@ -9,6 +9,12 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
     const tmplRow = document.querySelector('[id="user-row"]');
     const tmplCell = document.querySelector('[id="cell"]');
 
+    const blockEdit = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+    };
+
     const processCell = (row, key, data) => {
         const td = row.querySelector(`[key="${key}"]`);
         const cell = document.importNode(tmplCell.content, true);
@@ -33,7 +39,9 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
             span.hidden = false;
             form.hidden = true;
 
-            td.setAttribute('disabled', '');
+            const tr = td.closest('tr');
+            tr.setAttribute('disabled', '');
+            tr.addEventListener('click', blockEdit, true);
             span.removeEventListener('click', toggleSpanToForm);
 
             let fd;
@@ -116,10 +124,11 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
                 row.setAttribute('ID', result.ID)
                 insertButton.insertingNew = false;
             }
+            row.removeEventListener('click', blockEdit, true);
+            row.removeAttribute('disabled');
             Object.keys(result).filter(key => key != 'ID').forEach(key => {
                 const cell = row.querySelector(`[key="${key}"]`);
                 cell.innerHTML = '';
-                cell.removeAttribute('disabled');
                 processCell(row, key, result);
             });
         }
