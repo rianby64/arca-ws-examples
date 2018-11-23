@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gorilla/websocket"
 )
 
@@ -25,18 +27,23 @@ func response(request *JSONRPCrequest, conn *websocket.Conn,
 	return nil
 }
 
-func processRequest(request *JSONRPCrequest, conn *websocket.Conn) error {
-	if request.Method == "getUsers" {
-		return getUsers(request, conn)
+type requestHandler func(request *JSONRPCrequest, conn *websocket.Conn) error
+type requestHandlers map[string]requestHandler
+
+var handlers = requestHandlers{
+	"getUsers":   getUsers,
+	"updateUser": updateUser,
+	"insertUser": insertUser,
+	"deleteUser": deleteUser,
+}
+
+func processRequest(request *JSONRPCrequest, conn *websocket.Conn) {
+	handler, ok := handlers[request.Method]
+	if !ok {
+		log.Println("There's no handler for", request.Method)
 	}
-	if request.Method == "updateUser" {
-		return updateUser(request, conn)
+	err := handler(request, conn)
+	if err != nil {
+		log.Println(err)
 	}
-	if request.Method == "insertUser" {
-		return insertUser(request, conn)
-	}
-	if request.Method == "deleteUser" {
-		return deleteUser(request, conn)
-	}
-	return nil
 }

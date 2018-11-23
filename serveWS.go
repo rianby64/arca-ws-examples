@@ -38,9 +38,6 @@ func serveWS(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err := processRequest(&request, conn); err != nil {
-			log.Println(err)
-			return
-		}
+		go processRequest(&request, conn)
 	}
 }
