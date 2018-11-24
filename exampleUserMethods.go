@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 
+	"./arca"
 	"github.com/gorilla/websocket"
 )
 
@@ -24,12 +25,12 @@ var people = People{
 }
 var lastID = len(people)
 
-func getUsers(request *JSONRPCrequest, conn *websocket.Conn) error {
+func getUsers(request *arca.JSONRPCrequest, conn *websocket.Conn) error {
 	id := request.ID
-	return response(request, conn, people, &id)
+	return arca.Response(request, conn, people, &id)
 }
 
-func updateUser(request *JSONRPCrequest, conn *websocket.Conn) error {
+func updateUser(request *arca.JSONRPCrequest, conn *websocket.Conn) error {
 	params := request.Params.(map[string]interface{})
 	preid, ok := params["ID"]
 	if !ok {
@@ -49,13 +50,13 @@ func updateUser(request *JSONRPCrequest, conn *websocket.Conn) error {
 			if name, ok := params["Name"]; ok {
 				people[index].Name = name.(string)
 			}
-			return response(request, conn, people[index], nil)
+			return arca.Response(request, conn, people[index], nil)
 		}
 	}
 	return nil
 }
 
-func insertUser(request *JSONRPCrequest, conn *websocket.Conn) error {
+func insertUser(request *arca.JSONRPCrequest, conn *websocket.Conn) error {
 	params := request.Params.(map[string]interface{})
 	lastID++
 	newPerson := Person{ID: lastID}
@@ -66,10 +67,10 @@ func insertUser(request *JSONRPCrequest, conn *websocket.Conn) error {
 		newPerson.Name = name.(string)
 	}
 	people = append(people, newPerson)
-	return response(request, conn, newPerson, nil)
+	return arca.Response(request, conn, newPerson, nil)
 }
 
-func deleteUser(request *JSONRPCrequest, conn *websocket.Conn) error {
+func deleteUser(request *arca.JSONRPCrequest, conn *websocket.Conn) error {
 	params := request.Params.(map[string]interface{})
 	preid, ok := params["ID"]
 	if !ok {
@@ -85,7 +86,7 @@ func deleteUser(request *JSONRPCrequest, conn *websocket.Conn) error {
 	for i, person := range people {
 		if person.ID == id {
 			people = append(people[:i], people[i+1:]...)
-			return response(request, conn, deletedPerson, nil)
+			return arca.Response(request, conn, deletedPerson, nil)
 		}
 	}
 	return nil
