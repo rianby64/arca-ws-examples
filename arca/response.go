@@ -1,9 +1,11 @@
 package arca
 
-import "github.com/gorilla/websocket"
+import (
+	"github.com/gorilla/websocket"
+)
 
 func response(request *JSONRPCrequest, conn *websocket.Conn,
-	result interface{}) error {
+	result interface{}) []error {
 	var response JSONRPCresponse
 	response.Jsonrpc = "2.0"
 	response.Context = request.Context
@@ -11,14 +13,15 @@ func response(request *JSONRPCrequest, conn *websocket.Conn,
 	response.Result = result
 
 	// response
-	if &request.ID != nil {
+	if len(request.ID) > 0 {
 		response.ID = request.ID
-		return conn.WriteJSON(response)
+		return []error{conn.WriteJSON(response)}
 	}
 
 	// broadcast
+	var errors []error
 	for _, connection := range conns {
-		connection.WriteJSON(response)
+		errors = append(errors, connection.WriteJSON(response))
 	}
-	return nil
+	return errors
 }

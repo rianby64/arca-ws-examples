@@ -19,11 +19,12 @@ func processRequest(request *JSONRPCrequest, conn *websocket.Conn) {
 	}
 	result, err := handler(&request.Params)
 	if err != nil {
-		log.Println(err)
+		log.Println("handler error", err)
 		return
 	}
-	if err := response(request, conn, result); err != nil {
-		log.Println(err)
-		return
+	for _, err := range response(request, conn, result) {
+		if err != nil {
+			log.Println("response error", err)
+		}
 	}
 }
