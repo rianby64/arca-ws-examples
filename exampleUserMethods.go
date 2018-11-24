@@ -22,12 +22,12 @@ var people = People{
 }
 var lastID = len(people)
 
-func getUsers(requestParams interface{}) (interface{}, error) {
+func getUsers(requestParams *interface{}) (interface{}, error) {
 	return people, nil
 }
 
-func updateUser(requestParams interface{}) (interface{}, error) {
-	params := requestParams.(map[string]interface{})
+func updateUser(requestParams *interface{}) (interface{}, error) {
+	params := (*requestParams).(map[string]interface{})
 	preid, ok := params["ID"]
 	if !ok {
 		return nil, errors.New("params in request doesn't contain ID")
@@ -52,8 +52,8 @@ func updateUser(requestParams interface{}) (interface{}, error) {
 	return nil, errors.New("nothing")
 }
 
-func insertUser(requestParams interface{}) (interface{}, error) {
-	params := requestParams.(map[string]interface{})
+func insertUser(requestParams *interface{}) (interface{}, error) {
+	params := (*requestParams).(map[string]interface{})
 	lastID++
 	newPerson := Person{ID: lastID}
 	if email, ok := params["Email"]; ok {
@@ -66,8 +66,8 @@ func insertUser(requestParams interface{}) (interface{}, error) {
 	return newPerson, nil
 }
 
-func deleteUser(requestParams interface{}) (interface{}, error) {
-	params := requestParams.(map[string]interface{})
+func deleteUser(requestParams *interface{}) (interface{}, error) {
+	params := (*requestParams).(map[string]interface{})
 	preid, ok := params["ID"]
 	if !ok {
 		return nil, errors.New("params in request doesn't contain ID")

@@ -6,7 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-type requestHandler func(requestParams interface{}) (interface{}, error)
+type requestHandler func(requestParams *interface{}) (interface{}, error)
 type requestHandlers map[string]requestHandler
 
 var handlers = requestHandlers{}
@@ -17,7 +17,7 @@ func processRequest(request *JSONRPCrequest, conn *websocket.Conn) {
 		log.Println("There's no handler for", request.Method)
 		return
 	}
-	result, err := handler(request.Params)
+	result, err := handler(&request.Params)
 	if err != nil {
 		log.Println(err)
 		return
