@@ -2,9 +2,6 @@ package main
 
 import (
 	"errors"
-
-	"./arca"
-	"github.com/gorilla/websocket"
 )
 
 // Person whatever
@@ -25,20 +22,19 @@ var people = People{
 }
 var lastID = len(people)
 
-func getUsers(request *arca.JSONRPCrequest, conn *websocket.Conn) error {
-	id := request.ID
-	return arca.Response(request, conn, people, &id)
+func getUsers(requestParams interface{}) (interface{}, error) {
+	return people, nil
 }
 
-func updateUser(request *arca.JSONRPCrequest, conn *websocket.Conn) error {
-	params := request.Params.(map[string]interface{})
+func updateUser(requestParams interface{}) (interface{}, error) {
+	params := requestParams.(map[string]interface{})
 	preid, ok := params["ID"]
 	if !ok {
-		return errors.New("params in request doesn't contain ID")
+		return nil, errors.New("params in request doesn't contain ID")
 	}
 	preid2, ok := preid.(float64)
 	if !ok {
-		return errors.New("ID in params isn't int")
+		return nil, errors.New("ID in params isn't int")
 	}
 
 	id := int(preid2)
@@ -50,14 +46,14 @@ func updateUser(request *arca.JSONRPCrequest, conn *websocket.Conn) error {
 			if name, ok := params["Name"]; ok {
 				people[index].Name = name.(string)
 			}
-			return arca.Response(request, conn, people[index], nil)
+			return people[index], nil
 		}
 	}
-	return nil
+	return nil, errors.New("nothing")
 }
 
-func insertUser(request *arca.JSONRPCrequest, conn *websocket.Conn) error {
-	params := request.Params.(map[string]interface{})
+func insertUser(requestParams interface{}) (interface{}, error) {
+	params := requestParams.(map[string]interface{})
 	lastID++
 	newPerson := Person{ID: lastID}
 	if email, ok := params["Email"]; ok {
@@ -67,18 +63,18 @@ func insertUser(request *arca.JSONRPCrequest, conn *websocket.Conn) error {
 		newPerson.Name = name.(string)
 	}
 	people = append(people, newPerson)
-	return arca.Response(request, conn, newPerson, nil)
+	return newPerson, nil
 }
 
-func deleteUser(request *arca.JSONRPCrequest, conn *websocket.Conn) error {
-	params := request.Params.(map[string]interface{})
+func deleteUser(requestParams interface{}) (interface{}, error) {
+	params := requestParams.(map[string]interface{})
 	preid, ok := params["ID"]
 	if !ok {
-		return errors.New("params in request doesn't contain ID")
+		return nil, errors.New("params in request doesn't contain ID")
 	}
 	preid2, ok := preid.(float64)
 	if !ok {
-		return errors.New("ID in params isn't int")
+		return nil, errors.New("ID in params isn't int")
 	}
 
 	id := int(preid2)
@@ -86,8 +82,8 @@ func deleteUser(request *arca.JSONRPCrequest, conn *websocket.Conn) error {
 	for i, person := range people {
 		if person.ID == id {
 			people = append(people[:i], people[i+1:]...)
-			return arca.Response(request, conn, deletedPerson, nil)
+			return deletedPerson, nil
 		}
 	}
-	return nil
+	return nil, errors.New("nothing")
 }
