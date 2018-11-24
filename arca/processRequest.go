@@ -22,5 +22,8 @@ func processRequest(request *JSONRPCrequest, conn *websocket.Conn) {
 		log.Println(err)
 		return
 	}
-	response(request, conn, result)
+	if err := response(request, conn, result); err != nil {
+		log.Println(err)
+		return
+	}
 }
