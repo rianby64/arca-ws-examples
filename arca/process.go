@@ -1,7 +1,7 @@
 package arca
 
 import (
-	"errors"
+	"fmt"
 	"log"
 
 	"github.com/gorilla/websocket"
@@ -10,23 +10,25 @@ import (
 func matchHandlerFrom(request *JSONRPCrequest) (requestHandler, error) {
 
 	if request.Context == nil {
-		return nil, errors.New("Context must be present in request")
+		return nil, fmt.Errorf("Context must be present in request")
 	}
 	contextRequest, ok := request.Context.(map[string]interface{})
 	if !ok {
-		return nil, errors.New("Context must be an Object")
+		return nil, fmt.Errorf("Context must be an Object")
 	}
 	if contextRequest["source"] == nil {
-		return nil, errors.New("Context must define a source")
+		return nil, fmt.Errorf("Context must define a source")
 	}
 	sourceRequest, ok := contextRequest["source"].(string)
 	if !ok {
-		return nil, errors.New("Context has an incorrect source expecting an string")
+		return nil, fmt.Errorf(
+			"Context has an incorrect source expecting an string")
 	}
 
 	source, ok := handlers[sourceRequest]
 	if !ok {
-		return nil, errors.New("source not found")
+		return nil, fmt.Errorf("source '%s' not found in context '%s'",
+			sourceRequest, contextRequest)
 	}
 	return source[request.Method], nil
 }
