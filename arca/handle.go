@@ -30,6 +30,6 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			return
 		}
-		go processJSONRPCrequest(&request, conn)
+		processJSONRPCrequest(&request, conn)
 	}
 }

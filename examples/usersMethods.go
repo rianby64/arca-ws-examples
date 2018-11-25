@@ -1,9 +1,9 @@
-package main
+package examples
 
 import (
 	"errors"
 
-	"./arca"
+	"../arca"
 )
 
 // Person whatever
@@ -22,9 +22,10 @@ var people = People{
 	Person{2, "Jeff", "jeff@mail.com"},
 	Person{3, "Alice", "alice@mail.com"},
 }
-var lastID = len(people)
+var lastUsersID = len(people)
 
-var usersCRUD = arca.IRUD{
+// UsersCRUD the interface
+var UsersCRUD = arca.IRUD{
 	Read: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
 		return people, nil
 	},
@@ -55,8 +56,8 @@ var usersCRUD = arca.IRUD{
 	},
 	Insert: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
 		params := (*requestParams).(map[string]interface{})
-		lastID++
-		newPerson := Person{ID: lastID}
+		lastUsersID++
+		newPerson := Person{ID: lastUsersID}
 		if email, ok := params["Email"]; ok {
 			newPerson.Email = email.(string)
 		}

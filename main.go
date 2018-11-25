@@ -5,10 +5,12 @@ import (
 	"net/http"
 
 	"./arca"
+	"./examples"
 )
 
 func main() {
-	arca.RegisterSource("Users", usersCRUD)
+	arca.RegisterSource("Users", examples.UsersCRUD)
+	arca.RegisterSource("Goods", examples.GoodsCRUD)
 
 	http.HandleFunc("/ws", arca.Handle)
 	http.Handle("/", http.FileServer(http.Dir("./static")))

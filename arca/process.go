@@ -8,7 +8,6 @@ import (
 )
 
 func matchHandlerFrom(request *JSONRPCrequest) (requestHandler, error) {
-
 	if request.Method == "" {
 		return nil, fmt.Errorf("Method must be present in request")
 	}
@@ -27,7 +26,6 @@ func matchHandlerFrom(request *JSONRPCrequest) (requestHandler, error) {
 		return nil, fmt.Errorf(
 			"Context has an incorrect source expecting an string")
 	}
-
 	source, ok := handlers[sourceRequest]
 	if !ok {
 		return nil, fmt.Errorf("source '%s' not found in context '%s'",
@@ -43,7 +41,6 @@ func matchHandlerFrom(request *JSONRPCrequest) (requestHandler, error) {
 }
 
 func processJSONRPCrequest(request *JSONRPCrequest, conn *websocket.Conn) {
-
 	handler, err := matchHandlerFrom(request)
 	if err != nil {
 		log.Println("context error", err)

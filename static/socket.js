@@ -1,19 +1,26 @@
 'use strict';
 const conn = new WebSocket("ws://" + document.location.host + "/ws");
+conn.messageHandlers = {};
+
+conn.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+    const handler = conn.messageHandlers[data.Context.source] || function() {};
+    handler(data);
+}
+
+const blockEdit = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+};
 
 // Need to implement some Redux here in this thing...
-(() => {
-    const table = document.querySelector('#mytable');
-    const tbody = document.querySelector('tbody');
+function setupTable(tableid, rowid, source, fields) {
+    const table = document.querySelector(`#${tableid}`);
+    const tbody = table.querySelector('tbody');
     const insertButton = table.querySelector('[action="insert"]');
-    const tmplRow = document.querySelector('[id="user-row"]');
+    const tmplRow = document.querySelector(`[id="${rowid}"]`);
     const tmplCell = document.querySelector('[id="cell"]');
-
-    const blockEdit = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-    };
 
     const processCell = (row, key, data) => {
         const td = row.querySelector(`[key="${key}"]`);
@@ -64,7 +71,7 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
             }
             conn.send(JSON.stringify({...fd, 
                 context: {
-                    source: 'Users'
+                    source
                 }
             }));
         });
@@ -73,9 +80,10 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
     };
 
     const processRow = (data, row = document.importNode(tmplRow.content, true)) => {
-        row.querySelector('tr').setAttribute('ID', data.ID)
-        processCell(row, 'Name', data);
-        processCell(row, 'Email', data);
+        row.querySelector('tr').setAttribute('ID', data.ID);
+        fields.forEach(field => {
+            processCell(row, field, data);
+        });
         row.querySelector('[action="delete"]').addEventListener('click', e => {
             const id = Number(e.target.closest('tr').getAttribute('ID'));
             if (id > 0) {
@@ -86,7 +94,7 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
                         ID: id
                     },
                     context: {
-                        source: 'Users'
+                        source
                     }
                 }));
             }
@@ -102,8 +110,7 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
         insertButton.insertingNew = true;
     });
 
-    conn.onmessage = (e) => {
-        const data = JSON.parse(e.data);
+    const onmessage = (data) => {
         const result = data.Result;
         if (data.Method === 'delete') {
             let row = tbody.querySelector(`tr[id="${result.ID}"]`);
@@ -112,7 +119,7 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
             }
             return
         }
-        if (data.ID === 'id-for-getUsers') {
+        if (data.ID === `id-for-${source}`) {
             result.forEach(element => tbody.appendChild(processRow(element)));
         } else {
             let row = tbody.querySelector(`tr[id="${result.ID}"]`);
@@ -133,15 +140,20 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
             });
         }
     }
-    conn.onopen = () => {
-        const message = {
-            Jsonrpc: '2.0',
-            Method: 'read',
-            ID: 'id-for-getUsers',
-            context: {
-                source: 'Users'
-            }
-        };
-        conn.send(JSON.stringify(message));
-    }
-})();
+    conn.messageHandlers[source] = onmessage;
+
+    const message = {
+        Jsonrpc: '2.0',
+        Method: 'read',
+        ID: `id-for-${source}`,
+        context: {
+            source
+        }
+    };
+    conn.send(JSON.stringify(message));
+}
+
+conn.onopen = () => {
+    setupTable('goods', 'good-row', 'Goods', ['Description', 'Price']);
+    setupTable('users', 'user-row', 'Users', ['Name', 'Email']);
+}
