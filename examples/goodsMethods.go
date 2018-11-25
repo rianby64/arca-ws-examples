@@ -25,7 +25,7 @@ var goods = Goods{
 var lastGoodsID = len(goods)
 
 // GoodsCRUD the interface
-var GoodsCRUD = arca.IRUD{
+var GoodsCRUD = arca.DIRUD{
 	Read: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
 		return goods, nil
 	},

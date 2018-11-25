@@ -51,6 +51,10 @@ func processJSONRPCrequest(request *JSONRPCrequest, conn *websocket.Conn) {
 		log.Println("handler error", err)
 		return
 	}
+	if result == nil && err == nil {
+		log.Println("Empty result")
+		return
+	}
 	for _, err := range response(request, conn, result) {
 		if err != nil {
 			log.Println("response error", err)

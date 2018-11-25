@@ -111,7 +111,7 @@ function setupTable(tableid, rowid, source, fields) {
         insertButton.insertingNew = true;
     });
 
-    const onmessage = (data) => {
+    conn.messageHandlers[source] = (data) => {
         const result = data.Result;
         if (data.Method === 'delete') {
             let row = tbody.querySelector(`tr[id="${result.ID}"]`);
@@ -140,18 +140,22 @@ function setupTable(tableid, rowid, source, fields) {
                 processCell(row, key, result);
             });
         }
-    }
-    conn.messageHandlers[source] = onmessage;
-
-    const message = {
+    };
+    conn.send(JSON.stringify({
         Jsonrpc: '2.0',
         Method: 'read',
         ID: `id-for-${source}`,
         Context: {
             source
         }
-    };
-    conn.send(JSON.stringify(message));
+    }));
+    conn.send(JSON.stringify({
+        Jsonrpc: '2.0',
+        Method: 'subscribe',
+        Context: {
+            source
+        }
+    }));
 }
 
 conn.onopen = () => {
