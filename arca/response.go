@@ -1,8 +1,6 @@
 package arca
 
-import (
-	"github.com/gorilla/websocket"
-)
+import "github.com/gorilla/websocket"
 
 func response(request *JSONRPCrequest, conn *websocket.Conn,
 	result interface{}) []error {

@@ -41,3 +41,7 @@ type sIRUDd struct {
 	Subscribe func(requestParams *interface{}, context *interface{}) (interface{}, error)
 	Describe  func(requestParams *interface{}, context *interface{}) (interface{}, error)
 }
+
+type requestHandler func(requestParams *interface{},
+	context *interface{}) (interface{}, error)
+type requestHandlers map[string]map[string]requestHandler
