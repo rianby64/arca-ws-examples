@@ -1,42 +1,41 @@
 package arca
 
 import (
+	"errors"
 	"log"
 
 	"github.com/gorilla/websocket"
 )
 
-func processJSONRPCrequest(request *JSONRPCrequest, conn *websocket.Conn) {
+func matchHandlerFrom(request *JSONRPCrequest) (requestHandler, error) {
+
 	if request.Context == nil {
-		log.Println("Context must be present in request", request)
-		return
+		return nil, errors.New("Context must be present in request")
 	}
 	contextRequest, ok := request.Context.(map[string]interface{})
 	if !ok {
-		log.Println("Context must be an Object", request)
-		return
+		return nil, errors.New("Context must be an Object")
 	}
 	if contextRequest["source"] == nil {
-		log.Println("Context must define a source", request)
-		return
+		return nil, errors.New("Context must define a source")
 	}
 	sourceRequest, ok := contextRequest["source"].(string)
 	if !ok {
-		log.Println("Context has an incorrect source",
-			contextRequest, "expecting an string")
-		return
+		return nil, errors.New("Context has an incorrect source expecting an string")
 	}
 
 	source, ok := handlers[sourceRequest]
 	if !ok {
-		log.Printf("source not found for '%s'", sourceRequest)
-		return
+		return nil, errors.New("source not found")
 	}
+	return source[request.Method], nil
+}
 
-	handler, ok := source[request.Method]
-	if !ok {
-		log.Printf("handler not found for '%s' in source '%s'",
-			request.Method, sourceRequest)
+func processJSONRPCrequest(request *JSONRPCrequest, conn *websocket.Conn) {
+
+	handler, err := matchHandlerFrom(request)
+	if err != nil {
+		log.Println("context error", err)
 		return
 	}
 	result, err := handler(&request.Params, &request.Context)
