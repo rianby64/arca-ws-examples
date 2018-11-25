@@ -46,8 +46,9 @@ var GoodsCRUD = arca.IRUD{
 				if description, ok := params["Description"]; ok {
 					goods[index].Description = description.(string)
 				}
-				if price, ok := params["Price"]; ok {
-					goods[index].Price = price.(int)
+				if price, ok := params["Price"]; ok && price != nil {
+					preprice := price.(float64)
+					goods[index].Price = int(preprice)
 				}
 				return goods[index], nil
 			}
@@ -61,8 +62,9 @@ var GoodsCRUD = arca.IRUD{
 		if description, ok := params["Description"]; ok {
 			newGood.Description = description.(string)
 		}
-		if price, ok := params["Price"]; ok {
-			newGood.Price = price.(int)
+		if price, ok := params["Price"]; ok && price != nil {
+			preprice := price.(float64)
+			newGood.Price = int(preprice)
 		}
 		goods = append(goods, newGood)
 		return newGood, nil

@@ -69,8 +69,9 @@ function setupTable(tableid, rowid, source, fields) {
                     Params: data
                 };
             }
-            conn.send(JSON.stringify({...fd, 
-                context: {
+            conn.send(JSON.stringify({...fd,
+                Params: {...fd.Params, Price: Number(fd.Params.Price)},
+                Context: {
                     source
                 }
             }));
@@ -93,7 +94,7 @@ function setupTable(tableid, rowid, source, fields) {
                     Params: {
                         ID: id
                     },
-                    context: {
+                    Context: {
                         source
                     }
                 }));
@@ -146,7 +147,7 @@ function setupTable(tableid, rowid, source, fields) {
         Jsonrpc: '2.0',
         Method: 'read',
         ID: `id-for-${source}`,
-        context: {
+        Context: {
             source
         }
     };
