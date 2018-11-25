@@ -30,10 +30,10 @@ type JSONRPCresponse struct {
 
 // SIRUDD whatever
 type SIRUDD struct {
-	Subscribe func(requestParams *interface{}) (interface{}, error)
-	Insert    func(requestParams *interface{}) (interface{}, error)
-	Read      func(requestParams *interface{}) (interface{}, error)
-	Update    func(requestParams *interface{}) (interface{}, error)
-	Delete    func(requestParams *interface{}) (interface{}, error)
-	Describe  func(requestParams *interface{}) (interface{}, error)
+	Subscribe func(requestParams *interface{}, context *interface{}) (interface{}, error)
+	Insert    func(requestParams *interface{}, context *interface{}) (interface{}, error)
+	Read      func(requestParams *interface{}, context *interface{}) (interface{}, error)
+	Update    func(requestParams *interface{}, context *interface{}) (interface{}, error)
+	Delete    func(requestParams *interface{}, context *interface{}) (interface{}, error)
+	Describe  func(requestParams *interface{}, context *interface{}) (interface{}, error)
 }

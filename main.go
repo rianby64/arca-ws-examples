@@ -8,10 +8,7 @@ import (
 )
 
 func main() {
-	arca.RegisterMethod("getUsers", usersCRUD.Read)
-	arca.RegisterMethod("updateUser", usersCRUD.Update)
-	arca.RegisterMethod("insertUser", usersCRUD.Insert)
-	arca.RegisterMethod("deleteUser", usersCRUD.Delete)
+	arca.RegisterSource("Users", usersCRUD)
 
 	http.HandleFunc("/ws", arca.Handler)
 	http.Handle("/", http.FileServer(http.Dir("./static")))

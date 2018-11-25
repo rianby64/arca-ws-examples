@@ -39,12 +39,6 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			return
 		}
-
 		go processRequest(&request, conn)
 	}
-}
-
-// RegisterMethod whatever
-func RegisterMethod(name string, method requestHandler) {
-	handlers[name] = method
 }

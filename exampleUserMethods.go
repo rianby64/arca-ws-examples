@@ -25,10 +25,10 @@ var people = People{
 var lastID = len(people)
 
 var usersCRUD = arca.SIRUDD{
-	Read: func(requestParams *interface{}) (interface{}, error) {
+	Read: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
 		return people, nil
 	},
-	Update: func(requestParams *interface{}) (interface{}, error) {
+	Update: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
 		params := (*requestParams).(map[string]interface{})
 		preid, ok := params["ID"]
 		if !ok {
@@ -53,7 +53,7 @@ var usersCRUD = arca.SIRUDD{
 		}
 		return nil, errors.New("nothing")
 	},
-	Insert: func(requestParams *interface{}) (interface{}, error) {
+	Insert: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
 		params := (*requestParams).(map[string]interface{})
 		lastID++
 		newPerson := Person{ID: lastID}
@@ -66,7 +66,7 @@ var usersCRUD = arca.SIRUDD{
 		people = append(people, newPerson)
 		return newPerson, nil
 	},
-	Delete: func(requestParams *interface{}) (interface{}, error) {
+	Delete: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
 		params := (*requestParams).(map[string]interface{})
 		preid, ok := params["ID"]
 		if !ok {

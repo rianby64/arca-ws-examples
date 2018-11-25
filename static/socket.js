@@ -52,19 +52,19 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
 
                 fd = {
                     Jsonrpc: "2.0",
-                    Method: 'updateUser',
+                    Method: 'update',
                     Params: data
                 };
             } else {
                 fd = {
                     Jsonrpc: "2.0",
-                    Method: 'insertUser',
+                    Method: 'insert',
                     Params: data
                 };
             }
             conn.send(JSON.stringify({...fd, 
                 context: {
-                    table: 'Users'
+                    source: 'Users'
                 }
             }));
         });
@@ -81,12 +81,12 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
             if (id > 0) {
                 conn.send(JSON.stringify({
                     Jsonrpc: "2.0",
-                    Method: 'deleteUser',
+                    Method: 'delete',
                     Params: {
                         ID: id
                     },
                     context: {
-                        table: 'Users'
+                        source: 'Users'
                     }
                 }));
             }
@@ -105,7 +105,7 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
     conn.onmessage = (e) => {
         const data = JSON.parse(e.data);
         const result = data.Result;
-        if (data.Method === 'deleteUser') {
+        if (data.Method === 'delete') {
             let row = tbody.querySelector(`tr[id="${result.ID}"]`);
             if (row) {
                 row.remove();
@@ -136,10 +136,10 @@ const conn = new WebSocket("ws://" + document.location.host + "/ws");
     conn.onopen = () => {
         const message = {
             Jsonrpc: '2.0',
-            Method: 'getUsers',
+            Method: 'read',
             ID: 'id-for-getUsers',
             context: {
-                table: 'Users'
+                source: 'Users'
             }
         };
         conn.send(JSON.stringify(message));
