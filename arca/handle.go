@@ -15,6 +15,9 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 		}
+		if _, ok := subscriptions[conn]; ok {
+			delete(subscriptions, conn)
+		}
 		conn.Close()
 	})()
 

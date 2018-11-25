@@ -5,6 +5,7 @@ import (
 )
 
 var conns = []*websocket.Conn{}
+var subscriptions = map[*websocket.Conn][]string{}
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,

@@ -7,12 +7,11 @@ func dummy(requestParams *interface{}, context *interface{}) (interface{}, error
 // RegisterSource whatever
 func RegisterSource(name string, methods DIRUD) {
 	handlers[name] = map[string]requestHandler{
-		"subscribe": dummy,
-		"describe":  dummy,
-		"insert":    dummy,
-		"read":      dummy,
-		"update":    dummy,
-		"delete":    dummy,
+		"describe": dummy,
+		"insert":   dummy,
+		"read":     dummy,
+		"update":   dummy,
+		"delete":   dummy,
 	}
 
 	handler := handlers[name]

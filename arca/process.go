@@ -7,7 +7,23 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func matchHandlerFrom(request *JSONRPCrequest) (requestHandler, error) {
+func subscribe(conn *websocket.Conn, source string) {
+	found := false
+	if list, ok := subscriptions[conn]; ok {
+		for _, value := range list {
+			if value == source {
+				found = true
+				break
+			}
+		}
+	}
+	if !found {
+		subscriptions[conn] = append(subscriptions[conn], source)
+	}
+}
+
+func matchHandlerFrom(request *JSONRPCrequest,
+	conn *websocket.Conn) (requestHandler, error) {
 	if request.Method == "" {
 		return nil, fmt.Errorf("Method must be present in request")
 	}
@@ -33,6 +49,10 @@ func matchHandlerFrom(request *JSONRPCrequest) (requestHandler, error) {
 	}
 	handler, ok := source[request.Method]
 	if !ok {
+		if request.Method == "subscribe" {
+			subscribe(conn, sourceRequest)
+			return nil, nil
+		}
 		return nil, fmt.Errorf(
 			"Method '%s' not found. Source is '%s'",
 			request.Method, sourceRequest)
@@ -41,9 +61,12 @@ func matchHandlerFrom(request *JSONRPCrequest) (requestHandler, error) {
 }
 
 func processJSONRPCrequest(request *JSONRPCrequest, conn *websocket.Conn) {
-	handler, err := matchHandlerFrom(request)
+	handler, err := matchHandlerFrom(request, conn)
 	if err != nil {
 		log.Println("context error", err)
+		return
+	}
+	if handler == nil && err == nil {
 		return
 	}
 	result, err := handler(&request.Params, &request.Context)
