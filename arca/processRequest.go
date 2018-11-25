@@ -31,13 +31,11 @@ func processRequest(request *JSONRPCrequest, conn *websocket.Conn) {
 }
 
 // RegisterSource whatever
-func RegisterSource(name string, methods SIRUDD) {
+func RegisterSource(name string, methods IRUD) {
 	handlers[name] = map[string]requestHandler{
-		"subscribe": methods.Subscribe,
-		"insert":    methods.Insert,
-		"read":      methods.Read,
-		"update":    methods.Update,
-		"delete":    methods.Delete,
-		"describe":  methods.Describe,
+		"insert": methods.Insert,
+		"read":   methods.Read,
+		"update": methods.Update,
+		"delete": methods.Delete,
 	}
 }

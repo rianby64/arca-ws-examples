@@ -24,7 +24,7 @@ var people = People{
 }
 var lastID = len(people)
 
-var usersCRUD = arca.SIRUDD{
+var usersCRUD = arca.IRUD{
 	Read: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
 		return people, nil
 	},
