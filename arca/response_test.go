@@ -108,3 +108,86 @@ func Test_response_one_request_broadcast(t *testing.T) {
 	}
 	setupGlobals()
 }
+
+func Test_response_one_request_broadcast_one_subscriber(t *testing.T) {
+	t.Log("Response via broadcast if ID is not given and if subscribe one conn")
+	source := "context"
+	conn1 := &websocket.Conn{}
+	conn2 := &websocket.Conn{}
+
+	appendConnection(conn1)
+	appendConnection(conn2)
+	subscribe(conn1, source)
+
+	request := JSONRPCrequest{}
+	request.ID = ""
+	request.Method = "method"
+	request.Context = map[string]interface{}{"source": source}
+
+	result := reflect.ValueOf(map[string]string{"result": "result"}).Interface()
+	counter := 0
+
+	writeJSON = func(_ *websocket.Conn, response *JSONRPCresponse) error {
+		// you should test if conn == conn1 and if conn != conn2
+		checkRequestResponse(t, &result, &request, response)
+		counter++
+		return nil
+	}
+
+	errs := response(&request, &websocket.Conn{}, &result)
+	if counter == 1 {
+		t.Log("One responses were send")
+	} else {
+		t.Error("No response was send", errs)
+	}
+	if len(errs) == 1 {
+		if errs[0] == nil {
+			t.Log("The response was send correctly")
+		} else {
+			t.Error(errs)
+		}
+	}
+	setupGlobals()
+}
+
+func Test_response_one_request_broadcast_different_subscribers(t *testing.T) {
+	t.Log("Response via broadcast if ID is not given and if subscribers are different")
+	source := "context"
+	conn1 := &websocket.Conn{}
+	conn2 := &websocket.Conn{}
+
+	appendConnection(conn1)
+	appendConnection(conn2)
+	subscribe(conn1, source)
+	subscribe(conn1, "different-context")
+
+	request := JSONRPCrequest{}
+	request.ID = ""
+	request.Method = "method"
+	request.Context = map[string]interface{}{"source": source}
+
+	result := reflect.ValueOf(map[string]string{"result": "result"}).Interface()
+	counter := 0
+
+	writeJSON = func(_ *websocket.Conn, response *JSONRPCresponse) error {
+		// you should test if conn == conn1 and if conn != conn2
+		checkRequestResponse(t, &result, &request, response)
+		counter++
+		return nil
+	}
+
+	errs := response(&request, &websocket.Conn{}, &result)
+	if counter == 1 {
+		t.Log("One responses were send")
+	} else {
+		t.Error("No response was send", errs)
+	}
+	if len(errs) == 1 {
+		if errs[0] == nil {
+			t.Log("The response was send correctly")
+		} else {
+			t.Error(errs)
+		}
+	}
+	setupGlobals()
+}
