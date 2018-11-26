@@ -35,14 +35,12 @@ func matchHandlerFrom(request *JSONRPCrequest,
 	handler, ok := source[request.Method]
 	if !ok {
 		if request.Method == "subscribe" {
-			handler = func(requestParams *interface{},
-				context *interface{}) (interface{}, error) {
+			handler = func(_ *interface{}, _ *interface{}) (interface{}, error) {
 				subscribe(conn, sourceRequest)
 				return nil, nil
 			}
 		} else if request.Method == "unsubscribe" {
-			handler = func(requestParams *interface{},
-				context *interface{}) (interface{}, error) {
+			handler = func(_ *interface{}, _ *interface{}) (interface{}, error) {
 				unsubscribe(conn, sourceRequest)
 				return nil, nil
 			}
