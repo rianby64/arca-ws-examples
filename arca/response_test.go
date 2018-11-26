@@ -30,6 +30,7 @@ func checkRequestResponse(t *testing.T, result *interface{},
 }
 
 func Test_response_one_request_with_ID(t *testing.T) {
+	t.Log("Response to the sender if ID is given")
 	request := JSONRPCrequest{}
 	request.ID = "ID"
 	request.Method = "method"
@@ -68,6 +69,7 @@ func Test_response_one_request_with_ID(t *testing.T) {
 }
 
 func Test_response_one_request_broadcast(t *testing.T) {
+	t.Log("Response via broadcast if ID is not given")
 	source := "context"
 	conn1 := &websocket.Conn{}
 	conn2 := &websocket.Conn{}
