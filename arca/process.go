@@ -70,7 +70,7 @@ func processJSONRPCrequest(request *JSONRPCrequest, conn *websocket.Conn) {
 		log.Println("Empty result")
 		return
 	}
-	for _, err := range response(request, conn, result) {
+	for _, err := range response(request, conn, &result) {
 		if err != nil {
 			log.Println("response error", err)
 		}

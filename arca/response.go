@@ -7,12 +7,12 @@ import (
 )
 
 func response(request *JSONRPCrequest, conn *websocket.Conn,
-	result interface{}) []error {
+	result *interface{}) []error {
 
 	var response JSONRPCresponse
 	response.Context = &request.Context
 	response.Method = request.Method
-	response.Result = &result
+	response.Result = result
 
 	// response
 	if len(request.ID) > 0 {
