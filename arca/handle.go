@@ -8,7 +8,7 @@ import (
 // Handle is for serving WS
 func Handle(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
-	defer removeConnection(conn)
+	defer removeConnection(conn, true)
 
 	if err != nil {
 		log.Println("connecting", err)

@@ -38,10 +38,18 @@ func RegisterSource(name string, methods DIRUD) {
 }
 
 func appendConnection(conn *websocket.Conn) {
-	conns = append(conns, conn)
+	connsTmp := make([]*websocket.Conn, len(conns)+1)
+	for i, c := range conns {
+		if c == conn {
+			return
+		}
+		connsTmp[i] = c
+	}
+	connsTmp[len(conns)] = conn
+	conns = connsTmp
 }
 
-func removeConnection(conn *websocket.Conn) {
+func removeConnection(conn *websocket.Conn, closeConn bool) {
 	for i, c := range conns {
 		if c == conn {
 			conns = append(conns[:i], conns[i+1:]...)
@@ -51,7 +59,9 @@ func removeConnection(conn *websocket.Conn) {
 	if _, ok := subscriptions[conn]; ok {
 		delete(subscriptions, conn)
 	}
-	conn.Close()
+	if closeConn {
+		conn.Close()
+	}
 }
 
 func subscribe(conn *websocket.Conn, source string) {
