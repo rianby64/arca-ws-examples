@@ -2,7 +2,6 @@ package arca
 
 // JSONRPCBase is the base for both request and response structures
 type JSONRPCBase struct {
-	Jsonrpc string
 	ID      string
 	Method  string
 	Context interface{}

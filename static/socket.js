@@ -58,13 +58,11 @@ function setupTable(tableid, rowid, source, fields) {
                 span.textContent = data[key] ? data[key] : '-';
 
                 fd = {
-                    Jsonrpc: "2.0",
                     Method: 'update',
                     Params: data
                 };
             } else {
                 fd = {
-                    Jsonrpc: "2.0",
                     Method: 'insert',
                     Params: data
                 };
@@ -89,7 +87,6 @@ function setupTable(tableid, rowid, source, fields) {
             const id = Number(e.target.closest('tr').getAttribute('ID'));
             if (id > 0) {
                 conn.send(JSON.stringify({
-                    Jsonrpc: "2.0",
                     Method: 'delete',
                     Params: {
                         ID: id
@@ -142,7 +139,6 @@ function setupTable(tableid, rowid, source, fields) {
         }
     };
     conn.send(JSON.stringify({
-        Jsonrpc: '2.0',
         Method: 'read',
         ID: `id-for-${source}`,
         Context: {
@@ -150,7 +146,6 @@ function setupTable(tableid, rowid, source, fields) {
         }
     }));
     conn.send(JSON.stringify({
-        Jsonrpc: '2.0',
         Method: 'subscribe',
         Context: {
             source
