@@ -1,8 +1,6 @@
 package arca
 
 import (
-	"errors"
-
 	"github.com/gorilla/websocket"
 )
 
@@ -22,13 +20,12 @@ func response(request *JSONRPCrequest, conn *websocket.Conn,
 
 	// broadcast
 	var errs []error
-	subscribers, ok := subscriptions[conn]
-	if !ok {
-		errs = append(errs, errors.New("Incredible"))
-		return errs
-	}
+	source := request.Context.(map[string]interface{})["source"].(string)
 	for _, conn := range conns {
-		source := response.Context.(map[string]interface{})["source"].(string)
+		subscribers, ok := subscriptions[conn]
+		if !ok {
+			continue
+		}
 		for _, subscribed := range subscribers {
 			if source == subscribed {
 				errs = append(errs, writeJSON(conn, &response))
