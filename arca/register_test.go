@@ -27,9 +27,9 @@ func Test_setupGlobals_initial(t *testing.T) {
 
 func Test_setupGlobals_executed(t *testing.T) {
 	t.Log("Check result of execution setupGlobals")
-	conn := &websocket.Conn{}
-	conns = append(conns, conn)
-	subscriptions[conn] = nil
+	conn1 := &websocket.Conn{}
+	conns = append(conns, conn1)
+	subscriptions[conn1] = nil
 	handlers[""] = nil
 
 	if len(conns) == 1 {
@@ -52,9 +52,9 @@ func Test_setupGlobals_executed(t *testing.T) {
 
 func Test_appendConnection_once(t *testing.T) {
 	t.Log("Check appendConnection if call it once")
-	conn := &websocket.Conn{}
+	conn1 := &websocket.Conn{}
 	conn2 := &websocket.Conn{}
-	appendConnection(conn)
+	appendConnection(conn1)
 
 	if len(conns) == 1 {
 		t.Log("append one element")
@@ -72,10 +72,10 @@ func Test_appendConnection_once(t *testing.T) {
 
 func Test_appendConnection_twice(t *testing.T) {
 	t.Log("Check appendConnection if call it once")
-	conn := &websocket.Conn{}
+	conn1 := &websocket.Conn{}
 	conn2 := &websocket.Conn{}
-	appendConnection(conn)
-	appendConnection(conn)
+	appendConnection(conn1)
+	appendConnection(conn1)
 
 	if len(conns) == 1 {
 		t.Log("append one element")
@@ -148,6 +148,7 @@ func Test_subscribe_twice(t *testing.T) {
 }
 
 func Test_RegisterSource(t *testing.T) {
+	t.Log("Check RegisterSource")
 	sourceMock := "source_mock"
 	RegisterSource(sourceMock, DIRUD{})
 
