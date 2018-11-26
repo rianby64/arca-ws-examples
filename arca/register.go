@@ -1,7 +1,14 @@
 package arca
 
+import (
+	"fmt"
+
+	"github.com/gorilla/websocket"
+)
+
 func dummy(requestParams *interface{}, context *interface{}) (interface{}, error) {
-	return nil, nil
+	return nil, fmt.Errorf("dummy executed with source %s",
+		(*context).(map[string]interface{})["source"].(string))
 }
 
 // RegisterSource whatever
@@ -28,4 +35,22 @@ func RegisterSource(name string, methods DIRUD) {
 	if methods.Delete != nil {
 		handler["delete"] = methods.Delete
 	}
+}
+
+func subscribe(conn *websocket.Conn, source string) {
+	found := false
+	if list, ok := subscriptions[conn]; ok {
+		for _, value := range list {
+			if value == source {
+				found = true
+				break
+			}
+		}
+	}
+	if !found {
+		subscriptions[conn] = append(subscriptions[conn], source)
+	}
+}
+
+func unsubscribe(conn *websocket.Conn, source string) {
 }

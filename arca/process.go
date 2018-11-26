@@ -7,21 +7,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func subscribe(conn *websocket.Conn, source string) {
-	found := false
-	if list, ok := subscriptions[conn]; ok {
-		for _, value := range list {
-			if value == source {
-				found = true
-				break
-			}
-		}
-	}
-	if !found {
-		subscriptions[conn] = append(subscriptions[conn], source)
-	}
-}
-
 func matchHandlerFrom(request *JSONRPCrequest,
 	conn *websocket.Conn) (requestHandler, error) {
 	if request.Method == "" {
@@ -50,12 +35,22 @@ func matchHandlerFrom(request *JSONRPCrequest,
 	handler, ok := source[request.Method]
 	if !ok {
 		if request.Method == "subscribe" {
-			subscribe(conn, sourceRequest)
-			return nil, nil
+			handler = func(requestParams *interface{},
+				context *interface{}) (interface{}, error) {
+				subscribe(conn, sourceRequest)
+				return nil, nil
+			}
+		} else if request.Method == "unsubscribe" {
+			handler = func(requestParams *interface{},
+				context *interface{}) (interface{}, error) {
+				unsubscribe(conn, sourceRequest)
+				return nil, nil
+			}
+		} else {
+			return nil, fmt.Errorf(
+				"Method '%s' not found. Source is '%s'",
+				request.Method, sourceRequest)
 		}
-		return nil, fmt.Errorf(
-			"Method '%s' not found. Source is '%s'",
-			request.Method, sourceRequest)
 	}
 	return handler, nil
 }
@@ -64,9 +59,6 @@ func processJSONRPCrequest(request *JSONRPCrequest, conn *websocket.Conn) {
 	handler, err := matchHandlerFrom(request, conn)
 	if err != nil {
 		log.Println("context error", err)
-		return
-	}
-	if handler == nil && err == nil {
 		return
 	}
 	result, err := handler(&request.Params, &request.Context)
