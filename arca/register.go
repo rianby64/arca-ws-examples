@@ -78,4 +78,24 @@ func subscribe(conn *websocket.Conn, source string) {
 }
 
 func unsubscribe(conn *websocket.Conn, source string) {
+	found := false
+	var listTmp []string
+	if list, ok := subscriptions[conn]; ok {
+		if len(list) == 0 {
+			return
+		}
+		listTmp := make([]string, len(list)-1)
+		i := 0
+		for _, value := range list {
+			if value == source {
+				found = true
+				continue
+			}
+			listTmp[i] = value
+			i++
+		}
+	}
+	if found {
+		subscriptions[conn] = listTmp
+	}
 }
