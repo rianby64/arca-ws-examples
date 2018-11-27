@@ -7,7 +7,7 @@ import (
 
 // Handle is for serving WS
 func Handle(w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
+	conn, err := upgradeConnection(w, r)
 	defer removeConnection(conn)
 
 	if err != nil {
@@ -18,7 +18,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	appendConnection(conn)
 	for {
 		var request JSONRPCrequest
-		if err := conn.ReadJSON(&request); err != nil {
+		if err := readJSON(conn, &request); err != nil {
 			log.Println(err)
 			return
 		}
