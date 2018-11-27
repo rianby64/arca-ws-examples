@@ -155,3 +155,50 @@ func Test_matchHandler_request_to_subscribe(t *testing.T) {
 	}
 	setupGlobals()
 }
+
+func Test_matchHandler_request_to_unsubscribe(t *testing.T) {
+	t.Log("Match the unsubscribe's handler")
+	source := "source-defined"
+	otherSource := "whatever-else"
+	conn := websocket.Conn{}
+	methods := DIRUD{
+		Read: func(requestParams *interface{},
+			context *interface{}) (interface{}, error) {
+			return nil, nil
+		},
+	}
+	RegisterSource(source, &methods)
+	subscribe(&conn, source)
+	subscribe(&conn, otherSource)
+	request := JSONRPCrequest{}
+	request.Method = "subscribe"
+	request.Context = map[string]interface{}{"source": source}
+
+	handler, err := matchHandler(&request, &conn)
+	if err != nil {
+		t.Error("Unexpected error", err)
+	}
+	if handler == nil {
+		t.Error("The Context must match the handler [source-defined][subscribe]")
+		if err == nil {
+			t.Error("nil handler must lead to an error")
+		}
+	} else {
+		(*handler)(&request.Params, &request.Context)
+		subscribed, isConnSubscribed := subscriptions[&conn]
+		if isConnSubscribed {
+			item := subscribed[0]
+			if len(subscribed) == 2 {
+				t.Logf("Array of subscribed items still contain 2 elements")
+			}
+			if item == otherSource {
+				t.Logf("%s left in subscriptions", otherSource)
+			} else {
+				t.Errorf("Unexpected behavior. Subscribed item != %s", otherSource)
+			}
+		} else {
+			t.Errorf("expecting to see %s", source)
+		}
+	}
+	setupGlobals()
+}
