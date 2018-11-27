@@ -84,7 +84,7 @@ func unsubscribe(conn *websocket.Conn, source string) {
 		if len(list) == 0 {
 			return
 		}
-		listTmp := make([]string, len(list)-1)
+		listTmp = make([]string, len(list)-1)
 		i := 0
 		for _, value := range list {
 			if value == source {

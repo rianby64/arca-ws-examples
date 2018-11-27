@@ -119,12 +119,7 @@ func Test_matchHandler_request_to_subscribe(t *testing.T) {
 	t.Log("Match the subscribe's handler")
 	source := "source-defined"
 	conn := websocket.Conn{}
-	methods := DIRUD{
-		Read: func(requestParams *interface{},
-			context *interface{}) (interface{}, error) {
-			return nil, nil
-		},
-	}
+	methods := DIRUD{}
 	RegisterSource(source, &methods)
 	request := JSONRPCrequest{}
 	request.Method = "subscribe"
@@ -161,17 +156,12 @@ func Test_matchHandler_request_to_unsubscribe(t *testing.T) {
 	source := "source-defined"
 	otherSource := "whatever-else"
 	conn := websocket.Conn{}
-	methods := DIRUD{
-		Read: func(requestParams *interface{},
-			context *interface{}) (interface{}, error) {
-			return nil, nil
-		},
-	}
+	methods := DIRUD{}
 	RegisterSource(source, &methods)
 	subscribe(&conn, source)
 	subscribe(&conn, otherSource)
 	request := JSONRPCrequest{}
-	request.Method = "subscribe"
+	request.Method = "unsubscribe"
 	request.Context = map[string]interface{}{"source": source}
 
 	handler, err := matchHandler(&request, &conn)
@@ -179,7 +169,7 @@ func Test_matchHandler_request_to_unsubscribe(t *testing.T) {
 		t.Error("Unexpected error", err)
 	}
 	if handler == nil {
-		t.Error("The Context must match the handler [source-defined][subscribe]")
+		t.Error("The Context must match the handler [source-defined][unsubscribe]")
 		if err == nil {
 			t.Error("nil handler must lead to an error")
 		}
