@@ -7,7 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func matchHandlerFrom(request *JSONRPCrequest,
+func matchHandler(request *JSONRPCrequest,
 	conn *websocket.Conn) (requestHandler, error) {
 	if request.Method == "" {
 		return nil, fmt.Errorf("Method must be present in request")
@@ -54,7 +54,7 @@ func matchHandlerFrom(request *JSONRPCrequest,
 }
 
 func processJSONRPCrequest(request *JSONRPCrequest, conn *websocket.Conn) {
-	handler, err := matchHandlerFrom(request, conn)
+	handler, err := matchHandler(request, conn)
 	if err != nil {
 		log.Println("context error", err)
 		return
