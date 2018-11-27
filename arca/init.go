@@ -8,6 +8,7 @@ var connections []*websocket.Conn
 var subscriptions map[*websocket.Conn][]string
 var handlers requestHandlers
 var writeJSON func(conn *websocket.Conn, response *JSONRPCresponse) error
+var closeConnection func(conn *websocket.Conn) error
 
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  64,
@@ -20,6 +21,9 @@ func setupGlobals() {
 	handlers = requestHandlers{}
 	writeJSON = func(conn *websocket.Conn, response *JSONRPCresponse) error {
 		return conn.WriteJSON(response)
+	}
+	closeConnection = func(conn *websocket.Conn) error {
+		return conn.Close()
 	}
 }
 

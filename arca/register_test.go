@@ -95,14 +95,24 @@ func Test_appendConnection_twice(t *testing.T) {
 
 func Test_removeConnection(t *testing.T) {
 	t.Log("Check removeConnection")
+	closeConnCalled := false
+	closeConnection = func(_ *websocket.Conn) error {
+		closeConnCalled = true
+		return nil
+	}
 	conn := &websocket.Conn{}
 	appendConnection(conn)
-	removeConnection(conn, false)
+	removeConnection(conn)
 
 	if len(connections) == 0 {
 		t.Log("append one element")
 	} else {
 		t.Error("remove is not happening")
+	}
+	if closeConnCalled {
+		t.Log("close connection called")
+	} else {
+		t.Error("close connection not called")
 	}
 	setupGlobals()
 }

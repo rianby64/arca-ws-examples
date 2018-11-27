@@ -49,7 +49,7 @@ func appendConnection(conn *websocket.Conn) {
 	connections = connsTmp
 }
 
-func removeConnection(conn *websocket.Conn, closeConn bool) {
+func removeConnection(conn *websocket.Conn) {
 	for i, c := range connections {
 		if c == conn {
 			connections = append(connections[:i], connections[i+1:]...)
@@ -59,9 +59,7 @@ func removeConnection(conn *websocket.Conn, closeConn bool) {
 	if _, ok := subscriptions[conn]; ok {
 		delete(subscriptions, conn)
 	}
-	if closeConn {
-		conn.Close()
-	}
+	closeConnection(conn)
 }
 
 func subscribe(conn *websocket.Conn, source string) {
