@@ -141,8 +141,14 @@ func Test_matchHandler_request_to_subscribe(t *testing.T) {
 		}
 	} else {
 		(*handler)(&request.Params, &request.Context)
-		if subscriptions[&conn][0] == source {
-			t.Logf("%s in subscriptions", source)
+		subscribed, isConnSubscribed := subscriptions[&conn]
+		if isConnSubscribed {
+			item := subscribed[0]
+			if item == source {
+				t.Logf("%s in subscriptions", source)
+			} else {
+				t.Errorf("expecting to see subscribed item = %s", source)
+			}
 		} else {
 			t.Errorf("expecting to see %s", source)
 		}
