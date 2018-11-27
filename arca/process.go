@@ -2,7 +2,6 @@ package arca
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/gorilla/websocket"
 )
@@ -57,24 +56,23 @@ func matchHandler(request *JSONRPCrequest,
 	return handler, nil
 }
 
-func processJSONRPCrequest(request *JSONRPCrequest, conn *websocket.Conn) {
+func processJSONRPCrequest(request *JSONRPCrequest, conn *websocket.Conn) []error {
 	handler, err := matchHandler(request, conn)
 	if err != nil {
-		log.Println("context error", err)
-		return
+		return []error{fmt.Errorf("context error %s", err)}
 	}
 	result, err := (*handler)(&request.Params, &request.Context)
 	if err != nil {
-		log.Println("handler error", err)
-		return
+		return []error{fmt.Errorf("handler error %s", err)}
 	}
 	if result == nil && err == nil {
-		log.Println("Empty result")
-		return
+		return nil
 	}
+	errs := []error{}
 	for _, err := range response(request, conn, &result) {
 		if err != nil {
-			log.Println("response error", err)
+			errs = append(errs, fmt.Errorf("response error %s", err))
 		}
 	}
+	return errs
 }
