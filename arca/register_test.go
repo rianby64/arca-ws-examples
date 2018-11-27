@@ -8,10 +8,10 @@ import (
 
 func Test_setupGlobals_initial(t *testing.T) {
 	t.Log("Check initial state")
-	if len(conns) == 0 {
-		t.Log("conns has 0 item")
+	if len(connections) == 0 {
+		t.Log("connections has 0 item")
 	} else {
-		t.Error("expected conns to be nil")
+		t.Error("expected connections to be nil")
 	}
 	if len(subscriptions) == 0 {
 		t.Log("subscriptions has 0 item")
@@ -28,14 +28,14 @@ func Test_setupGlobals_initial(t *testing.T) {
 func Test_setupGlobals_executed(t *testing.T) {
 	t.Log("Check result of execution setupGlobals")
 	conn1 := &websocket.Conn{}
-	conns = append(conns, conn1)
+	connections = append(connections, conn1)
 	subscriptions[conn1] = nil
 	handlers[""] = nil
 
-	if len(conns) == 1 {
-		t.Log("conns has 1 item")
+	if len(connections) == 1 {
+		t.Log("connections has 1 item")
 	} else {
-		t.Error("expected conns to have one element")
+		t.Error("expected connections to have one element")
 	}
 	if len(subscriptions) == 1 {
 		t.Log("subscriptions has 1 item")
@@ -56,10 +56,10 @@ func Test_appendConnection_once(t *testing.T) {
 	conn2 := &websocket.Conn{}
 	appendConnection(conn1)
 
-	if len(conns) == 1 {
+	if len(connections) == 1 {
 		t.Log("append one element")
 		appendConnection(conn2)
-		if len(conns) == 2 {
+		if len(connections) == 2 {
 			t.Log("append zero elements")
 		} else {
 			t.Error("append repeating element")
@@ -77,11 +77,11 @@ func Test_appendConnection_twice(t *testing.T) {
 	appendConnection(conn1)
 	appendConnection(conn1)
 
-	if len(conns) == 1 {
+	if len(connections) == 1 {
 		t.Log("append one element")
 		appendConnection(conn2)
 		appendConnection(conn2)
-		if len(conns) == 2 {
+		if len(connections) == 2 {
 			t.Log("append zero elements")
 		} else {
 			t.Error("append repeating element")
@@ -98,7 +98,7 @@ func Test_removeConnection(t *testing.T) {
 	appendConnection(conn)
 	removeConnection(conn, false)
 
-	if len(conns) == 0 {
+	if len(connections) == 0 {
 		t.Log("append one element")
 	} else {
 		t.Error("remove is not happening")

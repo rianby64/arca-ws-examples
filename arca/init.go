@@ -4,7 +4,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var conns []*websocket.Conn
+var connections []*websocket.Conn
 var subscriptions map[*websocket.Conn][]string
 var handlers requestHandlers
 var writeJSON func(conn *websocket.Conn, response *JSONRPCresponse) error
@@ -15,7 +15,7 @@ var upgrader = websocket.Upgrader{
 }
 
 func setupGlobals() {
-	conns = []*websocket.Conn{}
+	connections = []*websocket.Conn{}
 	subscriptions = map[*websocket.Conn][]string{}
 	handlers = requestHandlers{}
 	writeJSON = func(conn *websocket.Conn, response *JSONRPCresponse) error {

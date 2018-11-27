@@ -21,7 +21,7 @@ func response(request *JSONRPCrequest, conn *websocket.Conn,
 	// broadcast
 	var errs []error
 	source := request.Context.(map[string]interface{})["source"].(string)
-	for _, conn := range conns {
+	for _, conn := range connections {
 		subscribers, ok := subscriptions[conn]
 		if !ok {
 			continue
