@@ -23,6 +23,7 @@ func Test_setupGlobals_initial(t *testing.T) {
 	} else {
 		t.Error("expected handlers to be nil")
 	}
+	setupGlobals()
 }
 
 func Test_setupGlobals_executed(t *testing.T) {
@@ -150,11 +151,12 @@ func Test_subscribe_twice(t *testing.T) {
 func Test_RegisterSource(t *testing.T) {
 	t.Log("Check RegisterSource")
 	sourceMock := "source_mock"
-	RegisterSource(sourceMock, DIRUD{})
+	RegisterSource(sourceMock, &DIRUD{})
 
 	if len(handlers) == 1 {
 		t.Log("handlers got one element")
 	} else {
 		t.Error("handlers array is dirty")
 	}
+	setupGlobals()
 }

@@ -29,13 +29,13 @@ type JSONRPCresponse struct {
 
 // DIRUD whatever
 type DIRUD struct {
-	Describe func(requestParams *interface{}, context *interface{}) (interface{}, error)
-	Insert   func(requestParams *interface{}, context *interface{}) (interface{}, error)
-	Read     func(requestParams *interface{}, context *interface{}) (interface{}, error)
-	Update   func(requestParams *interface{}, context *interface{}) (interface{}, error)
-	Delete   func(requestParams *interface{}, context *interface{}) (interface{}, error)
+	Describe requestHandler
+	Insert   requestHandler
+	Read     requestHandler
+	Update   requestHandler
+	Delete   requestHandler
 }
 
 type requestHandler func(requestParams *interface{},
 	context *interface{}) (interface{}, error)
-type requestHandlers map[string]map[string]requestHandler
+type requestHandlers map[string]map[string]*requestHandler

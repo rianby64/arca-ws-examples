@@ -8,7 +8,7 @@ import (
 )
 
 func matchHandler(request *JSONRPCrequest,
-	conn *websocket.Conn) (requestHandler, error) {
+	conn *websocket.Conn) (*requestHandler, error) {
 	if request.Method == "" {
 		return nil, fmt.Errorf("Method must be present in request")
 	}
@@ -35,15 +35,19 @@ func matchHandler(request *JSONRPCrequest,
 	handler, ok := source[request.Method]
 	if !ok {
 		if request.Method == "subscribe" {
-			handler = func(_ *interface{}, _ *interface{}) (interface{}, error) {
+			var subscribeHandler requestHandler = func(_ *interface{},
+				_ *interface{}) (interface{}, error) {
 				subscribe(conn, sourceRequest)
 				return nil, nil
 			}
+			handler = &subscribeHandler
 		} else if request.Method == "unsubscribe" {
-			handler = func(_ *interface{}, _ *interface{}) (interface{}, error) {
+			var unsubscribeHandler requestHandler = func(_ *interface{},
+				_ *interface{}) (interface{}, error) {
 				unsubscribe(conn, sourceRequest)
 				return nil, nil
 			}
+			handler = &unsubscribeHandler
 		} else {
 			return nil, fmt.Errorf(
 				"Method '%s' not found. Source is '%s'",
@@ -59,7 +63,7 @@ func processJSONRPCrequest(request *JSONRPCrequest, conn *websocket.Conn) {
 		log.Println("context error", err)
 		return
 	}
-	result, err := handler(&request.Params, &request.Context)
+	result, err := (*handler)(&request.Params, &request.Context)
 	if err != nil {
 		log.Println("handler error", err)
 		return

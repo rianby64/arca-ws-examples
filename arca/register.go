@@ -2,38 +2,40 @@ package arca
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/gorilla/websocket"
 )
 
-func dummy(requestParams *interface{}, context *interface{}) (interface{}, error) {
+var dummy requestHandler = func(requestParams *interface{}, context *interface{}) (interface{}, error) {
 	return nil, fmt.Errorf("dummy executed with source %s",
 		(*context).(map[string]interface{})["source"].(string))
 }
 
 // RegisterSource whatever
-func RegisterSource(name string, methods DIRUD) {
-	handlers[name] = map[string]requestHandler{
-		"describe": dummy,
-		"insert":   dummy,
-		"read":     dummy,
-		"update":   dummy,
-		"delete":   dummy,
+func RegisterSource(name string, methods *DIRUD) {
+	handlers[name] = map[string]*requestHandler{
+		"describe": &dummy,
+		"insert":   &dummy,
+		"read":     &dummy,
+		"update":   &dummy,
+		"delete":   &dummy,
 	}
+	log.Println(handlers[name])
 
 	handler := handlers[name]
 	if methods.Insert != nil {
-		handler["insert"] = methods.Insert
+		handler["insert"] = &methods.Insert
 	}
 	if methods.Read != nil {
-		handler["read"] = methods.Read
+		handler["read"] = &methods.Read
 	}
 	if methods.Update != nil {
-		handler["update"] = methods.Update
+		handler["update"] = &methods.Update
 	}
 
 	if methods.Delete != nil {
-		handler["delete"] = methods.Delete
+		handler["delete"] = &methods.Delete
 	}
 }
 
