@@ -2,7 +2,6 @@ package arca
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/gorilla/websocket"
 )
@@ -21,7 +20,6 @@ func RegisterSource(name string, methods *DIRUD) {
 		"update":   &dummy,
 		"delete":   &dummy,
 	}
-	log.Println(handlers[name])
 
 	handler := handlers[name]
 	if methods.Insert != nil {
