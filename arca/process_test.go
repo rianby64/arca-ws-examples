@@ -81,7 +81,7 @@ func Test_matchHandler_request_with_Context_without_source(t *testing.T) {
 }
 
 func Test_matchHandler_request_with_Context_with_source(t *testing.T) {
-	t.Log("Match a handler fails if context defined in request contains a source")
+	t.Log("Match a handler if context defined in request contains a source")
 	conn := websocket.Conn{}
 	methods := DIRUD{
 		Read: func(requestParams *interface{},
@@ -110,6 +110,41 @@ func Test_matchHandler_request_with_Context_with_source(t *testing.T) {
 			t.Log("Matched handler and given method are the same")
 		} else {
 			t.Error("Matched handler differs from given method")
+		}
+	}
+	setupGlobals()
+}
+
+func Test_matchHandler_request_to_subscribe(t *testing.T) {
+	t.Log("Match the subscribe's handler")
+	source := "source-defined"
+	conn := websocket.Conn{}
+	methods := DIRUD{
+		Read: func(requestParams *interface{},
+			context *interface{}) (interface{}, error) {
+			return nil, nil
+		},
+	}
+	RegisterSource(source, &methods)
+	request := JSONRPCrequest{}
+	request.Method = "subscribe"
+	request.Context = map[string]interface{}{"source": source}
+
+	handler, err := matchHandler(&request, &conn)
+	if err != nil {
+		t.Error("Unexpected error", err)
+	}
+	if handler == nil {
+		t.Error("The Context must match the handler [source-defined][subscribe]")
+		if err == nil {
+			t.Error("nil handler must lead to an error")
+		}
+	} else {
+		(*handler)(&request.Params, &request.Context)
+		if subscriptions[&conn][0] == source {
+			t.Logf("%s in subscriptions", source)
+		} else {
+			t.Errorf("expecting to see %s", source)
 		}
 	}
 	setupGlobals()
