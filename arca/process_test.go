@@ -232,3 +232,31 @@ func Test_processRequest_request_to_subscribe(t *testing.T) {
 	}
 	setupGlobals()
 }
+
+func Test_processRequest_request_to_given_method(t *testing.T) {
+	t.Log("Match the handler read")
+	source := "source-defined"
+	conn := websocket.Conn{}
+	methodReached := false
+	methods := DIRUD{
+		Read: func(requestParams *interface{},
+			context *interface{}, _ ResponseHandler) []error {
+			t.Logf("Method read executed as expected")
+			methodReached = true
+			return nil
+		},
+	}
+	RegisterSource(source, &methods)
+	subscribe(&conn, source)
+	request := JSONRPCrequest{}
+	request.Method = "read"
+	request.Context = map[string]interface{}{"source": source}
+
+	processRequest(&request, &conn)
+	if methodReached {
+		t.Logf("Method read reached as expected")
+	} else {
+		t.Errorf("Method read not reached")
+	}
+	setupGlobals()
+}
