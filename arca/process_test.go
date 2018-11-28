@@ -101,7 +101,7 @@ func Test_matchHandler_request_with_Context_with_source(t *testing.T) {
 		t.Error("Unexpected error", err)
 	}
 	if handler == nil {
-		t.Error("The Context must match the handler [%s][%s]", source, method)
+		t.Errorf("The Context must match the handler [%s][%s]", source, method)
 		if err == nil {
 			t.Error("nil handler must lead to an error")
 		}
