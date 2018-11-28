@@ -24,8 +24,7 @@ var people = People{
 }
 var lastUsersID = len(people)
 
-// UsersCRUD the interface
-var UsersCRUD = arca.DIRUD{
+var usersCRUD = arca.DIRUD{
 	Read: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
 		return people, nil
 	},

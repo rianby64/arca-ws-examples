@@ -9,9 +9,8 @@ import (
 )
 
 func main() {
-	arca.RegisterSource("Users", &examples.UsersCRUD)
-	arca.RegisterSource("Goods", &examples.GoodsCRUD)
 
+	examples.Start()
 	http.HandleFunc("/ws", arca.Handle)
 	http.Handle("/", http.FileServer(http.Dir("./static")))
 

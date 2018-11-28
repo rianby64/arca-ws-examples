@@ -6,7 +6,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var dummy requestHandler = func(requestParams *interface{}, context *interface{}) (interface{}, error) {
+var dummy requestHandler = func(requestParams *interface{},
+	context *interface{}) (interface{}, error) {
 	return nil, fmt.Errorf("dummy executed with source %s",
 		(*context).(map[string]interface{})["source"].(string))
 }
