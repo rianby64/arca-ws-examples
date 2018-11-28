@@ -56,7 +56,7 @@ func matchHandler(request *JSONRPCrequest,
 	return handler, nil
 }
 
-func processJSONRPCrequest(request *JSONRPCrequest, conn *websocket.Conn) []error {
+func processRequest(request *JSONRPCrequest, conn *websocket.Conn) []error {
 	handler, err := matchHandler(request, conn)
 	if err != nil {
 		return []error{fmt.Errorf("context error %s", err)}
@@ -68,11 +68,5 @@ func processJSONRPCrequest(request *JSONRPCrequest, conn *websocket.Conn) []erro
 	if result == nil && err == nil {
 		return nil
 	}
-	errs := []error{}
-	for _, err := range response(request, conn, &result) {
-		if err != nil {
-			errs = append(errs, fmt.Errorf("response error %s", err))
-		}
-	}
-	return errs
+	return response(request, conn, &result)
 }

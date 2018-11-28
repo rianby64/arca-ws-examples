@@ -22,7 +22,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			return
 		}
-		for _, err := range processJSONRPCrequest(&request, conn) {
+		for _, err := range processRequest(&request, conn) {
 			if err != nil {
 				log.Println(err)
 			}
