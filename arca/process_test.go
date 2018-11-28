@@ -196,3 +196,39 @@ func Test_matchHandler_request_to_unsubscribe(t *testing.T) {
 	}
 	setupGlobals()
 }
+
+func Test_processRequest_request_to_subscribe(t *testing.T) {
+	t.Log("Match the subscribe's handler")
+	source := "source-defined"
+	conn := websocket.Conn{}
+	methods := DIRUD{}
+	RegisterSource(source, &methods)
+	request := JSONRPCrequest{}
+	request.Method = "subscribe"
+	request.Context = map[string]interface{}{"source": source}
+
+	errs := processRequest(&request, &conn)
+	if len(errs) == 1 {
+		t.Logf("'%s' subscribed correctly", source)
+		if errs[0] == nil {
+			t.Logf("Expected nil error")
+		} else {
+			t.Errorf("Unexpected error %s", errs[0])
+		}
+	} else {
+		t.Errorf("expecting to see an empty array in errs '%s'", errs)
+	}
+
+	subscribed, isConnSubscribed := subscriptions[&conn]
+	if isConnSubscribed {
+		item := subscribed[0]
+		if item == source {
+			t.Logf("%s subscribed correctly", source)
+		} else {
+			t.Errorf("Unexpected behavior. Subscribed item != '%s'", source)
+		}
+	} else {
+		t.Errorf("expecting to see '%s' in subscriptions", source)
+	}
+	setupGlobals()
+}

@@ -66,7 +66,7 @@ func processRequest(request *JSONRPCrequest, conn *websocket.Conn) []error {
 		return []error{fmt.Errorf("handler error %s", err)}
 	}
 	if result == nil && err == nil {
-		return nil
+		return []error{nil}
 	}
 	return response(request, conn, &result)
 }
