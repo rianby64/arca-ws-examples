@@ -7,9 +7,9 @@ import (
 )
 
 var dummy requestHandler = func(requestParams *interface{},
-	context *interface{}, _ *ResponseHandler) (interface{}, error) {
-	return nil, fmt.Errorf("dummy executed with source %s",
-		(*context).(map[string]interface{})["source"].(string))
+	context *interface{}, _ ResponseHandler) []error {
+	return []error{fmt.Errorf("dummy executed with source %s",
+		(*context).(map[string]interface{})["source"].(string))}
 }
 
 // RegisterSource whatever

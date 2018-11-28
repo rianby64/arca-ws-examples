@@ -87,8 +87,8 @@ func Test_matchHandler_request_with_Context_with_source(t *testing.T) {
 	method := "read"
 	methods := DIRUD{
 		Read: func(requestParams *interface{},
-			context *interface{}, _ *ResponseHandler) (interface{}, error) {
-			return nil, nil
+			context *interface{}, _ ResponseHandler) []error {
+			return nil
 		},
 	}
 	RegisterSource(source, &methods)

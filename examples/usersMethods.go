@@ -26,19 +26,19 @@ var lastUsersID = len(people)
 
 var usersCRUD = arca.DIRUD{
 	Read: func(requestParams *interface{}, context *interface{},
-		_ *arca.ResponseHandler) (interface{}, error) {
-		return people, nil
+		response arca.ResponseHandler) []error {
+		return response(&people)
 	},
 	Update: func(requestParams *interface{}, context *interface{},
-		_ *arca.ResponseHandler) (interface{}, error) {
+		response arca.ResponseHandler) []error {
 		params := (*requestParams).(map[string]interface{})
 		preid, ok := params["ID"]
 		if !ok {
-			return nil, errors.New("params in request doesn't contain ID")
+			return []error{errors.New("params in request doesn't contain ID")}
 		}
 		preid2, ok := preid.(float64)
 		if !ok {
-			return nil, errors.New("ID in params isn't int")
+			return []error{errors.New("ID in params isn't int")}
 		}
 
 		id := int(preid2)
@@ -50,13 +50,13 @@ var usersCRUD = arca.DIRUD{
 				if name, ok := params["Name"]; ok {
 					people[index].Name = name.(string)
 				}
-				return people[index], nil
+				return response(&people[index])
 			}
 		}
-		return nil, errors.New("nothing")
+		return []error{errors.New("nothing")}
 	},
 	Insert: func(requestParams *interface{}, context *interface{},
-		_ *arca.ResponseHandler) (interface{}, error) {
+		response arca.ResponseHandler) []error {
 		params := (*requestParams).(map[string]interface{})
 		lastUsersID++
 		newPerson := Person{ID: lastUsersID}
@@ -67,18 +67,18 @@ var usersCRUD = arca.DIRUD{
 			newPerson.Name = name.(string)
 		}
 		people = append(people, newPerson)
-		return newPerson, nil
+		return response(&newPerson)
 	},
 	Delete: func(requestParams *interface{}, context *interface{},
-		_ *arca.ResponseHandler) (interface{}, error) {
+		response arca.ResponseHandler) []error {
 		params := (*requestParams).(map[string]interface{})
 		preid, ok := params["ID"]
 		if !ok {
-			return nil, errors.New("params in request doesn't contain ID")
+			return []error{errors.New("params in request doesn't contain ID")}
 		}
 		preid2, ok := preid.(float64)
 		if !ok {
-			return nil, errors.New("ID in params isn't int")
+			return []error{errors.New("ID in params isn't int")}
 		}
 
 		id := int(preid2)
@@ -86,9 +86,9 @@ var usersCRUD = arca.DIRUD{
 		for i, person := range people {
 			if person.ID == id {
 				people = append(people[:i], people[i+1:]...)
-				return deletedPerson, nil
+				return response(&deletedPerson)
 			}
 		}
-		return nil, errors.New("nothing")
+		return []error{errors.New("nothing")}
 	},
 }

@@ -37,7 +37,7 @@ type DIRUD struct {
 }
 
 // ResponseHandler whatever
-type ResponseHandler func(data *interface{}) []error
+type ResponseHandler func(data interface{}) []error
 type requestHandler func(requestParams *interface{},
-	context *interface{}, response *ResponseHandler) (interface{}, error)
+	context *interface{}, response ResponseHandler) []error
 type requestHandlers map[string]map[string]*requestHandler
