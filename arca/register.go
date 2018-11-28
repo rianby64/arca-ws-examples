@@ -7,7 +7,7 @@ import (
 )
 
 var dummy requestHandler = func(requestParams *interface{},
-	context *interface{}) (interface{}, error) {
+	context *interface{}, _ *ResponseHandler) (interface{}, error) {
 	return nil, fmt.Errorf("dummy executed with source %s",
 		(*context).(map[string]interface{})["source"].(string))
 }

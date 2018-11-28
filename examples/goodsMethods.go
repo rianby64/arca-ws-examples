@@ -25,10 +25,12 @@ var goods = Goods{
 var lastGoodsID = len(goods)
 
 var goodsCRUD = arca.DIRUD{
-	Read: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
+	Read: func(requestParams *interface{}, context *interface{},
+		_ *arca.ResponseHandler) (interface{}, error) {
 		return goods, nil
 	},
-	Update: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
+	Update: func(requestParams *interface{}, context *interface{},
+		_ *arca.ResponseHandler) (interface{}, error) {
 		params := (*requestParams).(map[string]interface{})
 		preid, ok := params["ID"]
 		if !ok {
@@ -54,7 +56,8 @@ var goodsCRUD = arca.DIRUD{
 		}
 		return nil, errors.New("nothing")
 	},
-	Insert: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
+	Insert: func(requestParams *interface{}, context *interface{},
+		_ *arca.ResponseHandler) (interface{}, error) {
 		params := (*requestParams).(map[string]interface{})
 		lastGoodsID++
 		newGood := Good{ID: lastGoodsID}
@@ -68,7 +71,8 @@ var goodsCRUD = arca.DIRUD{
 		goods = append(goods, newGood)
 		return newGood, nil
 	},
-	Delete: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
+	Delete: func(requestParams *interface{}, context *interface{},
+		_ *arca.ResponseHandler) (interface{}, error) {
 		params := (*requestParams).(map[string]interface{})
 		preid, ok := params["ID"]
 		if !ok {

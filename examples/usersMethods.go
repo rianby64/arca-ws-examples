@@ -25,10 +25,12 @@ var people = People{
 var lastUsersID = len(people)
 
 var usersCRUD = arca.DIRUD{
-	Read: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
+	Read: func(requestParams *interface{}, context *interface{},
+		_ *arca.ResponseHandler) (interface{}, error) {
 		return people, nil
 	},
-	Update: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
+	Update: func(requestParams *interface{}, context *interface{},
+		_ *arca.ResponseHandler) (interface{}, error) {
 		params := (*requestParams).(map[string]interface{})
 		preid, ok := params["ID"]
 		if !ok {
@@ -53,7 +55,8 @@ var usersCRUD = arca.DIRUD{
 		}
 		return nil, errors.New("nothing")
 	},
-	Insert: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
+	Insert: func(requestParams *interface{}, context *interface{},
+		_ *arca.ResponseHandler) (interface{}, error) {
 		params := (*requestParams).(map[string]interface{})
 		lastUsersID++
 		newPerson := Person{ID: lastUsersID}
@@ -66,7 +69,8 @@ var usersCRUD = arca.DIRUD{
 		people = append(people, newPerson)
 		return newPerson, nil
 	},
-	Delete: func(requestParams *interface{}, context *interface{}) (interface{}, error) {
+	Delete: func(requestParams *interface{}, context *interface{},
+		_ *arca.ResponseHandler) (interface{}, error) {
 		params := (*requestParams).(map[string]interface{})
 		preid, ok := params["ID"]
 		if !ok {

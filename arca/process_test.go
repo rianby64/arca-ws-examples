@@ -87,7 +87,7 @@ func Test_matchHandler_request_with_Context_with_source(t *testing.T) {
 	method := "read"
 	methods := DIRUD{
 		Read: func(requestParams *interface{},
-			context *interface{}) (interface{}, error) {
+			context *interface{}, _ *ResponseHandler) (interface{}, error) {
 			return nil, nil
 		},
 	}
@@ -138,7 +138,7 @@ func Test_matchHandler_request_to_subscribe(t *testing.T) {
 			t.Error("nil handler must lead to an error")
 		}
 	} else {
-		(*handler)(&request.Params, &request.Context)
+		(*handler)(&request.Params, &request.Context, nil)
 		subscribed, isConnSubscribed := subscriptions[&conn]
 		if isConnSubscribed {
 			item := subscribed[0]
@@ -178,7 +178,7 @@ func Test_matchHandler_request_to_unsubscribe(t *testing.T) {
 			t.Error("nil handler must lead to an error")
 		}
 	} else {
-		(*handler)(&request.Params, &request.Context)
+		(*handler)(&request.Params, &request.Context, nil)
 		subscribed, isConnSubscribed := subscriptions[&conn]
 		if isConnSubscribed {
 			item := subscribed[0]
