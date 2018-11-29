@@ -87,7 +87,8 @@ func Test_matchHandler_request_with_Context_with_source(t *testing.T) {
 	method := "read"
 	methods := DIRUD{
 		Read: func(requestParams *interface{},
-			context *interface{}, _ ResponseHandler) []error {
+			context *interface{}, response chan interface{}) error {
+			response <- nil
 			return nil
 		},
 	}
@@ -121,6 +122,7 @@ func Test_matchHandler_request_to_subscribe(t *testing.T) {
 	t.Log("Match the subscribe's handler")
 	source := "source-defined"
 	method := "subscribe"
+	resultChan := make(chan interface{})
 	conn := websocket.Conn{}
 	methods := DIRUD{}
 	RegisterSource(source, &methods)
@@ -138,7 +140,7 @@ func Test_matchHandler_request_to_subscribe(t *testing.T) {
 			t.Error("nil handler must lead to an error")
 		}
 	} else {
-		(*handler)(&request.Params, &request.Context, nil)
+		(*handler)(&request.Params, &request.Context, resultChan)
 		subscribed, isConnSubscribed := subscriptions[&conn]
 		if isConnSubscribed {
 			item := subscribed[0]
@@ -159,6 +161,7 @@ func Test_matchHandler_request_to_unsubscribe(t *testing.T) {
 	source := "source-defined"
 	otherSource := "whatever-else"
 	method := "unsubscribe"
+	resultChan := make(chan interface{})
 	conn := websocket.Conn{}
 	methods := DIRUD{}
 	RegisterSource(source, &methods)
@@ -178,7 +181,7 @@ func Test_matchHandler_request_to_unsubscribe(t *testing.T) {
 			t.Error("nil handler must lead to an error")
 		}
 	} else {
-		(*handler)(&request.Params, &request.Context, nil)
+		(*handler)(&request.Params, &request.Context, resultChan)
 		subscribed, isConnSubscribed := subscriptions[&conn]
 		if isConnSubscribed {
 			item := subscribed[0]
@@ -198,7 +201,7 @@ func Test_matchHandler_request_to_unsubscribe(t *testing.T) {
 }
 
 func Test_processRequest_request_to_subscribe(t *testing.T) {
-	t.Log("Match the subscribe's handler")
+	t.Log("Process the subscribe's handler")
 	source := "source-defined"
 	conn := websocket.Conn{}
 	methods := DIRUD{}
@@ -234,15 +237,16 @@ func Test_processRequest_request_to_subscribe(t *testing.T) {
 }
 
 func Test_processRequest_request_to_given_method(t *testing.T) {
-	t.Log("Match the handler read")
+	t.Log("Process the handler read")
 	source := "source-defined"
 	conn := websocket.Conn{}
 	methodReached := false
 	methods := DIRUD{
 		Read: func(requestParams *interface{},
-			context *interface{}, _ ResponseHandler) []error {
+			context *interface{}, response chan interface{}) error {
 			t.Logf("Method read executed as expected")
 			methodReached = true
+			close(response)
 			return nil
 		},
 	}

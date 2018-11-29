@@ -26,19 +26,20 @@ var lastGoodsID = len(goods)
 
 var goodsCRUD = arca.DIRUD{
 	Read: func(requestParams *interface{}, context *interface{},
-		response arca.ResponseHandler) []error {
-		return response(&goods)
+		response chan interface{}) error {
+		go (func() { response <- goods })()
+		return nil
 	},
 	Update: func(requestParams *interface{}, context *interface{},
-		response arca.ResponseHandler) []error {
+		response chan interface{}) error {
 		params := (*requestParams).(map[string]interface{})
 		preid, ok := params["ID"]
 		if !ok {
-			return []error{errors.New("params in request doesn't contain ID")}
+			return errors.New("params in request doesn't contain ID")
 		}
 		preid2, ok := preid.(float64)
 		if !ok {
-			return []error{errors.New("ID in params isn't int")}
+			return errors.New("ID in params isn't int")
 		}
 
 		id := int(preid2)
@@ -51,13 +52,14 @@ var goodsCRUD = arca.DIRUD{
 					preprice := price.(float64)
 					goods[index].Price = int(preprice)
 				}
-				return response(&goods[index])
+				go (func() { response <- goods[index] })()
+				return nil
 			}
 		}
-		return []error{errors.New("nothing")}
+		return errors.New("nothing")
 	},
 	Insert: func(requestParams *interface{}, context *interface{},
-		response arca.ResponseHandler) []error {
+		response chan interface{}) error {
 		params := (*requestParams).(map[string]interface{})
 		lastGoodsID++
 		newGood := Good{ID: lastGoodsID}
@@ -69,18 +71,19 @@ var goodsCRUD = arca.DIRUD{
 			newGood.Price = int(preprice)
 		}
 		goods = append(goods, newGood)
-		return response(&newGood)
+		go (func() { response <- newGood })()
+		return nil
 	},
 	Delete: func(requestParams *interface{}, context *interface{},
-		response arca.ResponseHandler) []error {
+		response chan interface{}) error {
 		params := (*requestParams).(map[string]interface{})
 		preid, ok := params["ID"]
 		if !ok {
-			return []error{errors.New("params in request doesn't contain ID")}
+			return errors.New("params in request doesn't contain ID")
 		}
 		preid2, ok := preid.(float64)
 		if !ok {
-			return []error{errors.New("ID in params isn't int")}
+			return errors.New("ID in params isn't int")
 		}
 
 		id := int(preid2)
@@ -88,9 +91,10 @@ var goodsCRUD = arca.DIRUD{
 		for i, good := range goods {
 			if good.ID == id {
 				goods = append(goods[:i], goods[i+1:]...)
-				return response(deletedGood)
+				go (func() { response <- deletedGood })()
+				return nil
 			}
 		}
-		return []error{errors.New("nothing")}
+		return errors.New("nothing")
 	},
 }

@@ -35,16 +35,18 @@ func matchHandler(request *JSONRPCrequest,
 	if !ok {
 		if request.Method == "subscribe" {
 			var subscribeHandler requestHandler = func(_ *interface{},
-				_ *interface{}, _ ResponseHandler) []error {
+				_ *interface{}, response chan interface{}) error {
 				subscribe(conn, sourceRequest)
-				return []error{nil}
+				close(response)
+				return nil
 			}
 			handler = &subscribeHandler
 		} else if request.Method == "unsubscribe" {
 			var unsubscribeHandler requestHandler = func(_ *interface{},
-				_ *interface{}, _ ResponseHandler) []error {
+				_ *interface{}, response chan interface{}) error {
 				unsubscribe(conn, sourceRequest)
-				return []error{nil}
+				close(response)
+				return nil
 			}
 			handler = &unsubscribeHandler
 		} else {
@@ -61,12 +63,14 @@ func processRequest(request *JSONRPCrequest, conn *websocket.Conn) []error {
 	if err != nil {
 		return []error{fmt.Errorf("context error %s", err)}
 	}
-	var handlerResponse ResponseHandler = func(data interface{}) []error {
-		return response(request, conn, &data)
-	}
-	result := (*handler)(&request.Params, &request.Context, handlerResponse)
-	if err != nil {
+	resultChan := make(chan interface{})
+	if err := (*handler)(&request.Params, &request.Context, resultChan); err != nil {
 		return []error{fmt.Errorf("handler error %s", err)}
 	}
-	return result
+	result, ok := <-resultChan
+	if !ok {
+		return []error{nil}
+	}
+	defer close(resultChan)
+	return response(request, conn, &result)
 }

@@ -36,8 +36,6 @@ type DIRUD struct {
 	Delete   requestHandler
 }
 
-// ResponseHandler whatever
-type ResponseHandler func(data interface{}) []error
 type requestHandler func(requestParams *interface{},
-	context *interface{}, response ResponseHandler) []error
+	context *interface{}, response chan interface{}) error
 type requestHandlers map[string]map[string]*requestHandler
