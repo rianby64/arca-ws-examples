@@ -3,6 +3,8 @@ package arca
 import (
 	"log"
 	"net/http"
+
+	"github.com/gorilla/websocket"
 )
 
 // Handle is for serving WS
@@ -22,10 +24,14 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			return
 		}
-		for _, err := range processRequest(&request, conn) {
-			if err != nil {
-				log.Println(err)
-			}
+		go queueResponses(conn, &request)
+	}
+}
+
+func queueResponses(conn *websocket.Conn, request *JSONRPCrequest) {
+	for _, err := range processRequest(request, conn) {
+		if err != nil {
+			log.Println(err)
 		}
 	}
 }
