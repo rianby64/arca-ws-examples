@@ -27,7 +27,7 @@ var lastGoodsID = len(goods)
 var goodsCRUD = arca.DIRUD{
 	Read: func(requestParams *interface{}, context *interface{},
 		response chan interface{}) error {
-		response <- goods
+		//response <- goods
 		return nil
 	},
 	Update: func(requestParams *interface{}, context *interface{},
