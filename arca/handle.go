@@ -24,7 +24,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 			return
 		}
-		go queueResponses(conn, &request)
+		queueResponses(conn, &request)
 	}
 }
 

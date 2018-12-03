@@ -27,7 +27,7 @@ var lastUsersID = len(people)
 var usersCRUD = arca.DIRUD{
 	Read: func(requestParams *interface{}, context *interface{},
 		response chan interface{}) error {
-		go (func() { response <- &people })()
+		response <- &people
 		return nil
 	},
 	Update: func(requestParams *interface{}, context *interface{},
@@ -51,7 +51,7 @@ var usersCRUD = arca.DIRUD{
 				if name, ok := params["Name"]; ok {
 					people[index].Name = name.(string)
 				}
-				go (func() { response <- &people[index] })()
+				response <- &people[index]
 				return nil
 			}
 		}
@@ -69,7 +69,7 @@ var usersCRUD = arca.DIRUD{
 			newPerson.Name = name.(string)
 		}
 		people = append(people, newPerson)
-		go (func() { response <- &newPerson })()
+		response <- &newPerson
 		return nil
 	},
 	Delete: func(requestParams *interface{}, context *interface{},
@@ -89,7 +89,7 @@ var usersCRUD = arca.DIRUD{
 		for i, person := range people {
 			if person.ID == id {
 				people = append(people[:i], people[i+1:]...)
-				go (func() { response <- &deletedPerson })()
+				response <- &deletedPerson
 				return nil
 			}
 		}

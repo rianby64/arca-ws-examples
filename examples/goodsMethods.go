@@ -27,7 +27,7 @@ var lastGoodsID = len(goods)
 var goodsCRUD = arca.DIRUD{
 	Read: func(requestParams *interface{}, context *interface{},
 		response chan interface{}) error {
-		go (func() { response <- goods })()
+		response <- goods
 		return nil
 	},
 	Update: func(requestParams *interface{}, context *interface{},
@@ -52,7 +52,7 @@ var goodsCRUD = arca.DIRUD{
 					preprice := price.(float64)
 					goods[index].Price = int(preprice)
 				}
-				go (func() { response <- goods[index] })()
+				response <- goods[index]
 				return nil
 			}
 		}
@@ -71,7 +71,7 @@ var goodsCRUD = arca.DIRUD{
 			newGood.Price = int(preprice)
 		}
 		goods = append(goods, newGood)
-		go (func() { response <- newGood })()
+		response <- newGood
 		return nil
 	},
 	Delete: func(requestParams *interface{}, context *interface{},
@@ -91,7 +91,7 @@ var goodsCRUD = arca.DIRUD{
 		for i, good := range goods {
 			if good.ID == id {
 				goods = append(goods[:i], goods[i+1:]...)
-				go (func() { response <- deletedGood })()
+				response <- deletedGood
 				return nil
 			}
 		}
