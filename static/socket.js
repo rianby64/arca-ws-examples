@@ -145,15 +145,8 @@ function setupTable(tableid, rowid, source, fields) {
             source
         }
     }));
-    conn.send(JSON.stringify({
-        Method: 'subscribe',
-        Context: {
-            source
-        }
-    }));
 }
 
 conn.onopen = () => {
-    setupTable('goods', 'good-row', 'Goods', ['Description', 'Price']);
-    setupTable('users', 'user-row', 'Users', ['Name', 'Email']);
+    setupTable('users', 'user-row', 'test', ['Name', 'Email']);
 }

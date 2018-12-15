@@ -5,11 +5,13 @@ import (
 	"net/http"
 
 	example "./example_db"
+	arca "github.com/rianby64/arca-ws-jsonrpc"
 )
 
 func main() {
-
-	example.Start()
+	ws := arca.JSONRPCServerWS{}
+	example.GridTest(&ws)
+	http.HandleFunc("/ws", ws.Handle)
 	http.Handle("/", http.FileServer(http.Dir("./static")))
 
 	log.Println("Serving")

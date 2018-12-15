@@ -5,32 +5,61 @@ import (
 	"log"
 
 	_ "github.com/lib/pq" // for db
+	grid "github.com/rianby64/arca-grid"
+	arca "github.com/rianby64/arca-ws-jsonrpc"
 )
 
-// Start whatever
-func Start() {
-	log.Println("here we go with the db")
+// GridTest whatever
+func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
+
+	type testRow struct {
+		ID    int64
+		Name  string
+		Email string
+	}
+
+	g := grid.Grid{}
+
 	connStr := "user=arca password=arca dbname=arca sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	rows, err := db.Query(`SELECT id, name, email FROM test`)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var id interface{}
-	var name interface{}
-	var email interface{}
-	for rows.Next() {
-		err := rows.Scan(&id, &name, &email)
+	var queryHandler grid.RequestHandler = func(
+		requestParams *interface{},
+		context *interface{},
+		notify grid.NotifyCallback,
+	) (interface{}, error) {
+		rows, err := db.Query(`SELECT id, name, email FROM test`)
 		if err != nil {
 			log.Fatal(err)
 		}
-		log.Println(id, name, email)
-	}
 
-	rows.Close()
+		var results []testRow
+
+		var id interface{}
+		var name interface{}
+		var email interface{}
+		for rows.Next() {
+			err := rows.Scan(&id, &name, &email)
+			if err != nil {
+				log.Fatal(err)
+			}
+			results = append(results, testRow{
+				ID:    id.(int64),
+				Name:  name.(string),
+				Email: email.(string),
+			})
+		}
+
+		rows.Close()
+		return results, nil
+	}
+	g.RegisterMethod("query", &queryHandler)
+
+	var queryMethod arca.JSONRequestHandler = g.Query
+	s.RegisterMethod("test", "read", &queryMethod)
+
+	return &g
 }
