@@ -2,9 +2,12 @@ package example
 
 import (
 	"database/sql"
+	"encoding/json"
 	"log"
+	"time"
 
-	_ "github.com/lib/pq" // for db
+	// for db
+	"github.com/lib/pq"
 	grid "github.com/rianby64/arca-grid"
 	arca "github.com/rianby64/arca-ws-jsonrpc"
 )
@@ -26,13 +29,56 @@ func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
 		log.Fatal(err)
 	}
 
+	reportProblem := func(ev pq.ListenerEventType, err error) {
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+
+	minReconn := 10 * time.Second
+	maxReconn := time.Minute
+	listener := pq.NewListener(connStr, minReconn, maxReconn, reportProblem)
+	err = listener.Listen("jsonrpc")
+	if err != nil {
+		panic(err)
+	}
+
+	type pgNotifyJSONRPC struct {
+		Method string
+		Source string
+		Result interface{}
+	}
+
+	go (func() {
+		for {
+			msg, ok := <-listener.Notify
+			if !ok {
+				return
+			}
+			var notification pgNotifyJSONRPC
+			payload := []byte(msg.Extra)
+			json.Unmarshal(payload, &notification)
+
+			var context interface{} = map[string]string{
+				"source": notification.Source,
+			}
+			var response arca.JSONRPCresponse
+
+			response.Method = notification.Method
+			response.Context = context
+			response.Result = notification.Result
+
+			s.Broadcast(&response)
+		}
+	})()
+
 	var queryHandler grid.RequestHandler = func(
 		requestParams *interface{},
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
 		rows, err := db.Query(`
-		SELECT id, name, email FROM test
+		SELECT "ID", "Name", "Email" FROM test
 		`)
 		if err != nil {
 			log.Fatal(err)
@@ -81,20 +127,20 @@ func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
 		if okName && okEmail {
 			db.Exec(`
 			UPDATE test
-			SET name=$1, email=$2
-			WHERE id=$3;
+			SET "Name"=$1, "Email"=$2
+			WHERE "ID"=$3;
 			`, name, email, ID)
 		} else if okName {
 			db.Exec(`
 			UPDATE test
-			SET name=$1
-			WHERE id=$2;
+			SET "Name"=$1
+			WHERE "ID"=$2;
 			`, name, ID)
 		} else if okEmail {
 			db.Exec(`
 			UPDATE test
-			SET email=$1
-			WHERE id=$2;
+			SET "Email"=$1
+			WHERE "ID"=$2;
 			`, email, ID)
 		}
 		return nil, nil
@@ -112,17 +158,17 @@ func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
 
 		if okName && okEmail {
 			db.Exec(`
-			INSERT INTO test(name, email)
+			INSERT INTO test("Name", "Email")
 			VALUES ($1, $2);
 			`, name, email)
 		} else if okName {
 			db.Exec(`
-			INSERT INTO test(name)
+			INSERT INTO test("Name")
 			VALUES ($1);
 			`, name)
 		} else if okEmail {
 			db.Exec(`
-			INSERT INTO test(email)
+			INSERT INTO test("Email")
 			VALUES ($1);
 			`, email)
 		}
@@ -140,14 +186,14 @@ func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
 
 		db.Exec(`
 		DELETE FROM test
-		WHERE id=$1;
+		WHERE "ID"=$1;
 		`, ID)
 		return nil, nil
 	}
 	g.RegisterMethod("delete", &deleteHandler)
 
 	var insertMethod arca.JSONRequestHandler = g.Insert
-	s.RegisterMethod("test", "create", &insertMethod)
+	s.RegisterMethod("test", "insert", &insertMethod)
 	var queryMethod arca.JSONRequestHandler = g.Query
 	s.RegisterMethod("test", "read", &queryMethod)
 	var updateMethod arca.JSONRequestHandler = g.Update
