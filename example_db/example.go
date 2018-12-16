@@ -8,8 +8,12 @@ import (
 	arca "github.com/rianby64/arca-ws-jsonrpc"
 )
 
-// GridTest whatever
-func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
+// BindServerWithPg whatever
+func BindServerWithPg(
+	s *arca.JSONRPCServerWS,
+	connStr string,
+	db *sql.DB,
+) *grid.Grid {
 
 	type testRow struct {
 		ID    int64
@@ -18,12 +22,6 @@ func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
 	}
 
 	g := grid.Grid{}
-
-	connStr := "user=arca password=arca dbname=arca sslmode=disable"
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	var queryHandler grid.RequestHandler = func(
 		requestParams *interface{},
@@ -148,6 +146,6 @@ func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
 		Delete: &deleteHandler,
 	}
 
-	go bindArcaWithGrid(connStr, s, &g, &methods)
+	go BindArcaWithGrid(connStr, s, &g, &methods)
 	return &g
 }

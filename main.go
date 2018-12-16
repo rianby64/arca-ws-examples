@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 
@@ -10,12 +11,19 @@ import (
 
 func main() {
 	ws := arca.JSONRPCServerWS{}
-	example.GridTest(&ws)
+	connStr := "user=arca password=arca dbname=arca sslmode=disable"
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	example.BindServerWithPg(&ws, connStr, db)
+
 	http.HandleFunc("/ws", ws.Handle)
 	http.Handle("/", http.FileServer(http.Dir("./static")))
 
 	log.Println("Serving")
-	err := http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal(err)
 	}

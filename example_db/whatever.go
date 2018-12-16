@@ -10,7 +10,8 @@ import (
 	arca "github.com/rianby64/arca-ws-jsonrpc"
 )
 
-func bindArcaWithGrid(
+// BindArcaWithGrid whatever
+func BindArcaWithGrid(
 	connStr string,
 	s *arca.JSONRPCServerWS,
 	g *grid.Grid,
