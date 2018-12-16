@@ -68,7 +68,6 @@ function setupTable(tableid, rowid, source, fields) {
                 };
             }
             conn.send(JSON.stringify({...fd,
-                Params: {...fd.Params, Price: Number(fd.Params.Price)},
                 Context: {
                     source
                 }

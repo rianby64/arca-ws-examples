@@ -58,8 +58,37 @@ func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
 	}
 	g.RegisterMethod("query", &queryHandler)
 
+	var updateHandler grid.RequestHandler = func(
+		requestParams *interface{},
+		context *interface{},
+		notify grid.NotifyCallback,
+	) (interface{}, error) {
+		params := (*requestParams).(map[string]interface{})
+		name, okName := params["Name"]
+		email, okEmail := params["Email"]
+		ID := params["ID"].(float64)
+
+		if okName && okEmail {
+			db.QueryRow(`UPDATE test
+			SET name=$1, email=$2
+			WHERE id=$3`, name, email, ID)
+		} else if okName {
+			db.QueryRow(`UPDATE test
+			SET name=$1
+			WHERE id=$2`, name, ID)
+		} else if okEmail {
+			db.QueryRow(`UPDATE test
+			SET email=$1
+			WHERE id=$2`, email, ID)
+		}
+		return nil, nil
+	}
+	g.RegisterMethod("update", &updateHandler)
+
 	var queryMethod arca.JSONRequestHandler = g.Query
 	s.RegisterMethod("test", "read", &queryMethod)
+	var updateMethod arca.JSONRequestHandler = g.Update
+	s.RegisterMethod("test", "update", &updateMethod)
 
 	return &g
 }
