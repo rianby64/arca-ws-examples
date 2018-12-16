@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"log"
 
-	// for db
-
 	grid "github.com/rianby64/arca-grid"
 	arca "github.com/rianby64/arca-ws-jsonrpc"
 )
@@ -26,8 +24,6 @@ func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	go listenToPgNotifyToArca(connStr, s)
 
 	var queryHandler grid.RequestHandler = func(
 		requestParams *interface{},
@@ -69,7 +65,6 @@ func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
 		rows.Close()
 		return results, nil
 	}
-	g.RegisterMethod("query", &queryHandler)
 
 	var updateHandler grid.RequestHandler = func(
 		requestParams *interface{},
@@ -102,7 +97,6 @@ func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
 		}
 		return nil, nil
 	}
-	g.RegisterMethod("update", &updateHandler)
 
 	var insertHandler grid.RequestHandler = func(
 		requestParams *interface{},
@@ -131,7 +125,6 @@ func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
 		}
 		return nil, nil
 	}
-	g.RegisterMethod("insert", &insertHandler)
 
 	var deleteHandler grid.RequestHandler = func(
 		requestParams *interface{},
@@ -147,16 +140,14 @@ func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
 		`, ID)
 		return nil, nil
 	}
-	g.RegisterMethod("delete", &deleteHandler)
 
-	var insertMethod arca.JSONRequestHandler = g.Insert
-	s.RegisterMethod("test", "insert", &insertMethod)
-	var queryMethod arca.JSONRequestHandler = g.Query
-	s.RegisterMethod("test", "read", &queryMethod)
-	var updateMethod arca.JSONRequestHandler = g.Update
-	s.RegisterMethod("test", "update", &updateMethod)
-	var deleteMethod arca.JSONRequestHandler = g.Delete
-	s.RegisterMethod("test", "delete", &deleteMethod)
+	methods := grid.QUID{
+		Query:  &queryHandler,
+		Update: &updateHandler,
+		Insert: &insertHandler,
+		Delete: &deleteHandler,
+	}
 
+	go bindArcaWithGrid(connStr, s, &g, &methods)
 	return &g
 }

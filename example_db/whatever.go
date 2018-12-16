@@ -6,18 +6,34 @@ import (
 	"time"
 
 	"github.com/lib/pq"
+	grid "github.com/rianby64/arca-grid"
 	arca "github.com/rianby64/arca-ws-jsonrpc"
 )
 
-type pgNotifyJSONRPC struct {
-	Method string
-	Source string
-	Result interface{}
-}
+func bindArcaWithGrid(
+	connStr string,
+	s *arca.JSONRPCServerWS,
+	g *grid.Grid,
+	methods *grid.QUID) {
 
-// Want to Extend the package arca-ws-jsonrpc with the function below...
+	var queryMethod arca.JSONRequestHandler = g.Query
+	var updateMethod arca.JSONRequestHandler = g.Update
+	var insertMethod arca.JSONRequestHandler = g.Insert
+	var deleteMethod arca.JSONRequestHandler = g.Delete
 
-func listenToPgNotifyToArca(connStr string, s *arca.JSONRPCServerWS) {
+	s.RegisterMethod("test", "read", &queryMethod)
+	s.RegisterMethod("test", "update", &updateMethod)
+	s.RegisterMethod("test", "insert", &insertMethod)
+	s.RegisterMethod("test", "delete", &deleteMethod)
+
+	g.Register(methods)
+
+	type pgNotifyJSONRPC struct {
+		Method string
+		Source string
+		Result interface{}
+	}
+
 	reportProblem := func(_ pq.ListenerEventType, err error) {
 		if err != nil {
 			log.Fatalln(err)
