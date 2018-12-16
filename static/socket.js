@@ -63,7 +63,7 @@ function setupTable(tableid, rowid, source, fields) {
                 };
             } else {
                 fd = {
-                    Method: 'insert',
+                    Method: 'create',
                     Params: data
                 };
             }
