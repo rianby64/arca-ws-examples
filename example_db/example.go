@@ -2,12 +2,10 @@ package example
 
 import (
 	"database/sql"
-	"encoding/json"
 	"log"
-	"time"
 
 	// for db
-	"github.com/lib/pq"
+
 	grid "github.com/rianby64/arca-grid"
 	arca "github.com/rianby64/arca-ws-jsonrpc"
 )
@@ -29,48 +27,7 @@ func GridTest(s *arca.JSONRPCServerWS) *grid.Grid {
 		log.Fatal(err)
 	}
 
-	reportProblem := func(ev pq.ListenerEventType, err error) {
-		if err != nil {
-			log.Fatalln(err)
-		}
-	}
-
-	minReconn := 10 * time.Second
-	maxReconn := time.Minute
-	listener := pq.NewListener(connStr, minReconn, maxReconn, reportProblem)
-	err = listener.Listen("jsonrpc")
-	if err != nil {
-		panic(err)
-	}
-
-	type pgNotifyJSONRPC struct {
-		Method string
-		Source string
-		Result interface{}
-	}
-
-	go (func() {
-		for {
-			msg, ok := <-listener.Notify
-			if !ok {
-				return
-			}
-			var notification pgNotifyJSONRPC
-			payload := []byte(msg.Extra)
-			json.Unmarshal(payload, &notification)
-
-			var context interface{} = map[string]string{
-				"source": notification.Source,
-			}
-			var response arca.JSONRPCresponse
-
-			response.Method = notification.Method
-			response.Context = context
-			response.Result = notification.Result
-
-			s.Broadcast(&response)
-		}
-	})()
+	go listenToPgNotifyToArca(connStr, s)
 
 	var queryHandler grid.RequestHandler = func(
 		requestParams *interface{},
