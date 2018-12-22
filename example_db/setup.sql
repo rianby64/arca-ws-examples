@@ -1,4 +1,12 @@
 
+CREATE TABLE test
+(
+    "ID" serial,
+    "Email" text,
+    "Name" text,
+    CONSTRAINT "Test_pkey" PRIMARY KEY ("ID")
+);
+
 DROP FUNCTION IF EXISTS notify_jsonrpc CASCADE;
 CREATE FUNCTION notify_jsonrpc()
     RETURNS trigger
