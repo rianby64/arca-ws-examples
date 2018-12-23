@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	ws := arca.JSONRPCServerWS{}
+	ws := arca.JSONRPCExtensionWS{}
 	connStr := "user=arca password=arca dbname=arca sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {

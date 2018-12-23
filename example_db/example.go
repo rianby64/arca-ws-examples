@@ -10,7 +10,7 @@ import (
 
 // BindServerWithPg whatever
 func BindServerWithPg(
-	s *arca.JSONRPCServerWS,
+	s *arca.JSONRPCExtensionWS,
 	connStr string,
 	db *sql.DB,
 ) *grid.Grid {

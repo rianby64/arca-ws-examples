@@ -13,7 +13,7 @@ import (
 // BindArcaWithGrid whatever
 func BindArcaWithGrid(
 	connStr string,
-	s *arca.JSONRPCServerWS,
+	s *arca.JSONRPCExtensionWS,
 	g *grid.Grid,
 	methods *grid.QUID) {
 
