@@ -69,18 +69,11 @@ function setupTable(tableid, rowid, source, fields, convertFn) {
                     Params: converted
                 };
             }
-            console.log({...fd,
-                Context: {
-                    source
-                }
-            });
-            /*
             conn.send(JSON.stringify({...fd,
                 Context: {
                     source
                 }
             }));
-            */
         });
 
         td.appendChild(cell);
@@ -93,11 +86,11 @@ function setupTable(tableid, rowid, source, fields, convertFn) {
         });
         row.querySelector('[action="delete"]').addEventListener('click', e => {
             const id = e.target.closest('tr').getAttribute('ID');
-            if (id > 0) {
+            if (convertFn["ID"](id) > 0) {
                 conn.send(JSON.stringify({
                     Method: 'delete',
                     Params: {
-                        ID: id
+                        ID: convertFn["ID"](id)
                     },
                     Context: {
                         source
@@ -157,29 +150,25 @@ function setupTable(tableid, rowid, source, fields, convertFn) {
 
 conn.onopen = () => {
     setupTable(
-        'AAU',
-        'AAU-row',
-        'AAU',
-        ['ID', 'Parent', 'Expand', 'Description', 'Qop'],
+        'Table1',
+        'Table1-row',
+        'Table1',
+        ['ID', 'Num1', 'Num2'],
         {
-            "ID": String,
-            "Parent": String,
-            "Expand": Boolean,
-            "Description": String,
-            "Qop": Number,
+            "ID": Number,
+            "Num1": Number,
+            "Num2": Number,
+        }
+    );
+    setupTable(
+        'Table2',
+        'Table2-row',
+        'Table2',
+        ['ID', 'Num3', 'Num4'],
+        {
+            "ID": Number,
+            "Num3": Number,
+            "Num4": Number,
         }
     );
 }
-
-document.querySelector('#subir').addEventListener('click', e => {
-    conn.send(JSON.stringify({
-        Method: "insert",
-        Params: {
-          Description: "Una descripcion",
-          Parent: "-"
-        },
-        Context: {
-          source: "AAU"
-        }
-    }));
-})

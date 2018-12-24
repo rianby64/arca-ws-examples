@@ -17,7 +17,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	example.BindServerWithPg(&ws, connStr, db)
+	example.BindTable1WithPg(&ws, connStr, db)
+	example.BindTable2WithPg(&ws, connStr, db)
 
 	http.HandleFunc("/ws", ws.Handle)
 	http.Handle("/", http.FileServer(http.Dir("./static")))

@@ -16,26 +16,33 @@
                 <input type="submit" hidden>
             </form>
         </template>
-        <template id="AAU-row">
+        <template id="Table1-row">
             <tr>
 				<td key="ID"></td>
-				<td key="Parent"></td>
-				<td key="Expand"></td>
-				<td key="Description"></td>
-				<td key="Information"></td>
-				<td key="Unit"></td>
-				<td key="Qop"></td>
-				<td key="Estimated"></td>
+				<td key="Num1"></td>
+				<td key="Num2"></td>
+				<td key="CreatedAt"></td>
+                <td><button action="delete">-</button></td>
+            </tr>
+        </template>
+        <template id="Table2-row">
+            <tr>
+				<td key="ID"></td>
+				<td key="Num3"></td>
+				<td key="Num4"></td>
 				<td key="CreatedAt"></td>
                 <td><button action="delete">-</button></td>
             </tr>
         </template>
     </head>
     <body>
-        <table id="AAU">
-            <caption>AAU <button action="insert">+</button></caption>
+        <table id="Table1">
+            <caption>Table1 <button action="insert">+</button></caption>
             <tbody></tbody>
         </table>
-        <button id="subir">+ subir</button>
+        <table id="Table2">
+            <caption>Table2 <button action="insert">+</button></caption>
+            <tbody></tbody>
+        </table>
     </body>
 </html>
