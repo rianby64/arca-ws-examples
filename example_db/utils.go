@@ -15,17 +15,19 @@ func BindArcaWithGrid(
 	connStr string,
 	s *arca.JSONRPCExtensionWS,
 	g *grid.Grid,
-	methods *grid.QUID) {
+	methods *grid.QUID,
+	source string,
+) {
 
 	var queryMethod arca.JSONRequestHandler = g.Query
 	var updateMethod arca.JSONRequestHandler = g.Update
 	var insertMethod arca.JSONRequestHandler = g.Insert
 	var deleteMethod arca.JSONRequestHandler = g.Delete
 
-	s.RegisterMethod("test", "read", &queryMethod)
-	s.RegisterMethod("test", "update", &updateMethod)
-	s.RegisterMethod("test", "insert", &insertMethod)
-	s.RegisterMethod("test", "delete", &deleteMethod)
+	s.RegisterMethod(source, "read", &queryMethod)
+	s.RegisterMethod(source, "update", &updateMethod)
+	s.RegisterMethod(source, "insert", &insertMethod)
+	s.RegisterMethod(source, "delete", &deleteMethod)
 
 	g.Register(methods)
 

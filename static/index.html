@@ -16,18 +16,26 @@
                 <input type="submit" hidden>
             </form>
         </template>
-        <template id="user-row">
+        <template id="AAU-row">
             <tr>
-                <td key="Name"></td>
-                <td key="Email"></td>
+				<td key="ID"></td>
+				<td key="Parent"></td>
+				<td key="Expand"></td>
+				<td key="Description"></td>
+				<td key="Information"></td>
+				<td key="Unit"></td>
+				<td key="Qop"></td>
+				<td key="Estimated"></td>
+				<td key="CreatedAt"></td>
                 <td><button action="delete">-</button></td>
             </tr>
         </template>
     </head>
     <body>
-        <table id="users">
-            <caption>Users <button action="insert">+</button></caption>
+        <table id="AAU">
+            <caption>AAU <button action="insert">+</button></caption>
             <tbody></tbody>
         </table>
+        <button id="subir">+ subir</button>
     </body>
 </html>

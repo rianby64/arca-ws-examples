@@ -15,7 +15,7 @@ const blockEdit = (e) => {
 };
 
 // Need to implement some Redux here in this thing...
-function setupTable(tableid, rowid, source, fields) {
+function setupTable(tableid, rowid, source, fields, convertFn) {
     const table = document.querySelector(`#${tableid}`);
     const tbody = table.querySelector('tbody');
     const insertButton = table.querySelector('[action="insert"]');
@@ -53,25 +53,34 @@ function setupTable(tableid, rowid, source, fields) {
 
             let fd;
             const data = new FormData(e.target).toJSON();
-            if (Number(data.ID) > 0) {
-                data.ID = Number(data.ID);
+            const converted = Object.keys(data).reduce((acc, key) => {
+                acc[key] = convertFn[key](data[key]);
+                return acc;
+            }, {});
+            if (data.ID.toString() != 'undefined') {
                 span.textContent = data[key] ? data[key] : '-';
-
                 fd = {
                     Method: 'update',
-                    Params: data
+                    Params: converted
                 };
             } else {
                 fd = {
                     Method: 'insert',
-                    Params: data
+                    Params: converted
                 };
             }
+            console.log({...fd,
+                Context: {
+                    source
+                }
+            });
+            /*
             conn.send(JSON.stringify({...fd,
                 Context: {
                     source
                 }
             }));
+            */
         });
 
         td.appendChild(cell);
@@ -83,7 +92,7 @@ function setupTable(tableid, rowid, source, fields) {
             processCell(row, field, data);
         });
         row.querySelector('[action="delete"]').addEventListener('click', e => {
-            const id = Number(e.target.closest('tr').getAttribute('ID'));
+            const id = e.target.closest('tr').getAttribute('ID');
             if (id > 0) {
                 conn.send(JSON.stringify({
                     Method: 'delete',
@@ -147,5 +156,30 @@ function setupTable(tableid, rowid, source, fields) {
 }
 
 conn.onopen = () => {
-    setupTable('users', 'user-row', 'test', ['Name', 'Email']);
+    setupTable(
+        'AAU',
+        'AAU-row',
+        'AAU',
+        ['ID', 'Parent', 'Expand', 'Description', 'Qop'],
+        {
+            "ID": String,
+            "Parent": String,
+            "Expand": Boolean,
+            "Description": String,
+            "Qop": Number,
+        }
+    );
 }
+
+document.querySelector('#subir').addEventListener('click', e => {
+    conn.send(JSON.stringify({
+        Method: "insert",
+        Params: {
+          Description: "Una descripcion",
+          Parent: "-"
+        },
+        Context: {
+          source: "AAU"
+        }
+    }));
+})
