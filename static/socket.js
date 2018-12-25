@@ -183,4 +183,16 @@ conn.onopen = () => {
             "Sum13": Number,
         }
     );
+    setupTable(
+        'ViewSum2',
+        'ViewSum2-row',
+        'ViewSum2',
+        ['ID', 'Table1Num2', 'Table2Num4', 'Sum24'],
+        {
+            "ID": String,
+            "Table1Num2": Number,
+            "Table2Num4": Number,
+            "Sum24": Number,
+        }
+    );
 }

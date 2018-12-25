@@ -23,7 +23,6 @@ RETURN NULL;
 END;
 $$;
 
-
 CREATE TABLE IF NOT EXISTS "Table1"
 (
   "ID" SERIAL,
@@ -32,6 +31,10 @@ CREATE TABLE IF NOT EXISTS "Table1"
   "CreatedAt" timestamp with time zone DEFAULT now(),
   CONSTRAINT "Table1_pkey" PRIMARY KEY ("ID")
 );
+
+TRUNCATE "Table1";
+INSERT INTO "Table1"("Num1", "Num2")
+  VALUES (1.0, 1.0), (2.0, 2.0);
 
 DROP TRIGGER IF EXISTS "Table1_notify" ON "Table1" CASCADE;
 CREATE TRIGGER "Table1_notify"
@@ -49,6 +52,10 @@ CREATE TABLE IF NOT EXISTS "Table2"
   "CreatedAt" timestamp with time zone DEFAULT now(),
   CONSTRAINT "Table2_pkey" PRIMARY KEY ("ID")
 );
+
+TRUNCATE "Table2";
+INSERT INTO "Table2"("Num3", "Num4")
+  VALUES (1.0, 1.0), (2.0, 2.0);
 
 DROP TRIGGER IF EXISTS "Table2_notify" ON "Table2" CASCADE;
 CREATE TRIGGER "Table2_notify"
