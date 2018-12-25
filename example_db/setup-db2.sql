@@ -42,3 +42,86 @@ CREATE TRIGGER "ViewSum1_process"
 INSTEAD OF INSERT OR UPDATE OR DELETE ON "ViewSum1"
 FOR EACH ROW
 EXECUTE PROCEDURE process_viewsum1();
+
+CREATE OR REPLACE FUNCTION notify_from_table1_viewsum1_before()
+  RETURNS TRIGGER
+  LANGUAGE plpgsql
+AS $$
+DECLARE
+  r RECORD;
+BEGIN
+IF (TG_OP = 'DELETE') THEN
+  FOR r IN (SELECT
+      'ViewSum1' AS source,
+      LOWER(TG_OP) AS method,
+      row_to_json(t) AS result
+    FROM (SELECT "ViewSum1".*
+      FROM "ViewSum1"
+      WHERE "Table1ID"=OLD."ID"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
+  RETURN OLD;
+ELSIF (TG_OP = 'UPDATE') THEN
+  RETURN NEW;
+ELSIF (TG_OP = 'INSERT') THEN
+  RETURN NEW;
+END IF;
+RETURN NULL;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION notify_from_table1_viewsum1_after()
+  RETURNS TRIGGER
+  LANGUAGE plpgsql
+AS $$
+DECLARE
+  r RECORD;
+BEGIN
+IF (TG_OP = 'DELETE') THEN
+  RETURN OLD;
+ELSIF (TG_OP = 'UPDATE') THEN
+  FOR r IN (SELECT
+      'ViewSum1' AS source,
+      LOWER(TG_OP) AS method,
+      row_to_json(t) AS result
+    FROM (SELECT "ViewSum1".*
+      FROM "ViewSum1"
+      WHERE "Table1ID"=NEW."ID"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
+  RETURN NEW;
+ELSIF (TG_OP = 'INSERT') THEN
+  FOR r IN (SELECT
+      'ViewSum1' AS source,
+      LOWER(TG_OP) AS method,
+      row_to_json(t) AS result
+    FROM (SELECT "ViewSum1".*
+      FROM "ViewSum1"
+      WHERE "Table1ID"=NEW."ID"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
+  RETURN NEW;
+END IF;
+RETURN NULL;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS "Table1_notify_viewsum1_before" ON "Table1" CASCADE;
+CREATE TRIGGER "Table1_notify_viewsum1_before"
+  BEFORE INSERT OR UPDATE OR DELETE
+  ON "Table1"
+  FOR EACH ROW
+  EXECUTE PROCEDURE notify_from_table1_viewsum1_before();
+
+DROP TRIGGER IF EXISTS "Table1_notify_viewsum1_after" ON "Table1" CASCADE;
+CREATE TRIGGER "Table1_notify_viewsum1_after"
+  AFTER INSERT OR UPDATE OR DELETE
+  ON "Table1"
+  FOR EACH ROW
+  EXECUTE PROCEDURE notify_from_table1_viewsum1_after();
