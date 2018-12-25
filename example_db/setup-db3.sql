@@ -1,15 +1,15 @@
 
 \ir ./setup-db1.sql;
 
-DROP VIEW IF EXISTS "viewSum2" CASCADE;
+DROP VIEW IF EXISTS "ViewSum2" CASCADE;
 
-CREATE OR REPLACE VIEW "viewSum2" AS (
+CREATE OR REPLACE VIEW "ViewSum2" AS (
   SELECT
     "Table1"."ID" || ':' || "Table2"."ID" AS "ID",
-    "Table1"."ID" AS "Table1_ID",
-    "Table2"."ID" AS "Table2_ID",
-    "Table1"."Num2" AS "Table1_Num2",
-    "Table2"."Num4" AS "Table2_Num4",
+    "Table1"."ID" AS "Table1ID",
+    "Table2"."ID" AS "Table2ID",
+    "Table1"."Num2" AS "Table1Num2",
+    "Table2"."Num4" AS "Table2Num4",
     "Table1"."Num2" + "Table2"."Num4" AS "Sum24"
   FROM "Table1", "Table2"
 );
@@ -17,19 +17,19 @@ CREATE OR REPLACE VIEW "viewSum2" AS (
 CREATE OR REPLACE FUNCTION process_viewsum2()
   RETURNS trigger
   LANGUAGE 'plpgsql'
-  IMMUTABLE
+  VOLATILE
 AS $$
 BEGIN
 IF TG_OP = 'UPDATE' THEN
-  IF (NEW."Table1_Num2" <> OLD."Table1_Num2") THEN
+  IF (NEW."Table1Num2" <> OLD."Table1Num2") THEN
     UPDATE "Table1"
-      SET "Table1_Num2"=NEW."Table1_Num2"
-      WHERE "ID"=NEW."Table1_ID";
+      SET "Num2"=NEW."Table1Num2"
+      WHERE "ID"=NEW."Table1ID";
   END IF;
-  IF (NEW."Table2_Num4" <> OLD."Table2_Num4") THEN
+  IF (NEW."Table2Num4" <> OLD."Table2Num4") THEN
     UPDATE "Table2"
-      SET "Table2_Num4"=NEW."Table2_Num4"
-      WHERE "ID"=NEW."Table2_ID";
+      SET "Num4"=NEW."Table2Num4"
+      WHERE "ID"=NEW."Table2ID";
   END IF;
   RETURN NEW;
 END IF;

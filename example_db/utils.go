@@ -51,24 +51,26 @@ func BindArcaWithGrid(
 		panic(err)
 	}
 
-	for {
-		msg, ok := <-listener.Notify
-		if !ok {
-			return
+	go (func() {
+		for {
+			msg, ok := <-listener.Notify
+			if !ok {
+				return
+			}
+			var notification pgNotifyJSONRPC
+			payload := []byte(msg.Extra)
+			json.Unmarshal(payload, &notification)
+
+			var context interface{} = map[string]string{
+				"source": notification.Source,
+			}
+			var response arca.JSONRPCresponse
+
+			response.Method = notification.Method
+			response.Context = context
+			response.Result = notification.Result
+
+			s.Broadcast(&response)
 		}
-		var notification pgNotifyJSONRPC
-		payload := []byte(msg.Extra)
-		json.Unmarshal(payload, &notification)
-
-		var context interface{} = map[string]string{
-			"source": notification.Source,
-		}
-		var response arca.JSONRPCresponse
-
-		response.Method = notification.Method
-		response.Context = context
-		response.Result = notification.Result
-
-		s.Broadcast(&response)
-	}
+	})()
 }

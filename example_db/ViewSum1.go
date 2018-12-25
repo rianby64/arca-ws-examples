@@ -10,17 +10,20 @@ import (
 	arca "github.com/rianby64/arca-ws-jsonrpc"
 )
 
-// BindTable1WithPg whatever
-func BindTable1WithPg(
+// BindViewSum1WithPg whatever
+func BindViewSum1WithPg(
 	s *arca.JSONRPCExtensionWS,
 	connStr string,
 	db *sql.DB,
 ) *grid.Grid {
 
-	type Table1 struct {
-		ID   int64
-		Num1 float64
-		Num2 float64
+	type ViewSum1 struct {
+		ID         string
+		Table1ID   int64
+		Table2ID   int64
+		Table1Num1 float64
+		Table2Num3 float64
+		Sum13      float64
 	}
 
 	g := grid.Grid{}
@@ -33,48 +36,72 @@ func BindTable1WithPg(
 		rows, err := db.Query(`
 		SELECT
 			"ID",
-			"Num1",
-			"Num2"
-		FROM "Table1"
+			"Table1ID",
+			"Table2ID",
+			"Table1Num1",
+			"Table2Num3",
+			"Sum13"
+		FROM "ViewSum1"
 		`)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		var results []Table1
+		var results []ViewSum1
 
 		var iID interface{}
-		var iNum1 interface{}
-		var iNum2 interface{}
+		var iTable1ID interface{}
+		var iTable2ID interface{}
+		var iTable1Num1 interface{}
+		var iTable2Num3 interface{}
+		var iSum13 interface{}
 
 		for rows.Next() {
 			err := rows.Scan(
 				&iID,
-				&iNum1,
-				&iNum2,
+				&iTable1ID,
+				&iTable2ID,
+				&iTable1Num1,
+				&iTable2Num3,
+				&iSum13,
 			)
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			var ID int64
-			var Num1 float64
-			var Num2 float64
+			var ID string
+			var Table1ID int64
+			var Table2ID int64
+			var Table1Num1 float64
+			var Table2Num3 float64
+			var Sum13 float64
 
 			if iID != nil {
-				ID = iID.(int64)
+				ID = iID.(string)
 			}
-			if iNum1 != nil {
-				Num1 = iNum1.(float64)
+			if iTable1ID != nil {
+				Table1ID = iTable1ID.(int64)
 			}
-			if iNum2 != nil {
-				Num2 = iNum2.(float64)
+			if iTable2ID != nil {
+				Table2ID = iTable2ID.(int64)
+			}
+			if iTable1Num1 != nil {
+				Table1Num1 = iTable1Num1.(float64)
+			}
+			if iTable2Num3 != nil {
+				Table2Num3 = iTable2Num3.(float64)
+			}
+			if iSum13 != nil {
+				Sum13 = iSum13.(float64)
 			}
 
-			results = append(results, Table1{
-				ID:   ID,
-				Num1: Num1,
-				Num2: Num2,
+			results = append(results, ViewSum1{
+				ID:         ID,
+				Table1ID:   Table1ID,
+				Table2ID:   Table2ID,
+				Table1Num1: Table1Num1,
+				Table2Num3: Table2Num3,
+				Sum13:      Sum13,
 			})
 		}
 
@@ -90,18 +117,22 @@ func BindTable1WithPg(
 		params := (*requestParams).(map[string]interface{})
 		setters := []string{}
 		for key, value := range params {
-			if key == "ID" {
+			if key == "ID" ||
+				key == "Table1ID" ||
+				key == "Table2ID" ||
+				key == "Sum13" {
 				continue
 			}
-			if key == "Num1" || key == "Num2" {
+			if key == "Table1Num1" ||
+				key == "Table2Num3" {
 				Value := value.(float64)
 				setters = append(setters, fmt.Sprintf(`"%v"=%v`, key, Value))
 			}
 		}
 		strSetters := strings.Join(setters, ",")
-		ID := params["ID"].(float64)
+		ID := params["ID"].(string)
 		query := fmt.Sprintf(`
-		UPDATE "Table1"
+		UPDATE "ViewSum1"
 			SET %v
 			WHERE "ID"='%v';
 		`, strSetters, ID)
@@ -118,11 +149,14 @@ func BindTable1WithPg(
 		fields := []string{}
 		values := []string{}
 		for key, value := range params {
-			if key == "ID" {
+			if key == "ID" ||
+				key == "Table1ID" ||
+				key == "Table2ID" ||
+				key == "Sum13" {
 				continue
 			}
 			fields = append(fields, fmt.Sprintf(`"%v"`, key))
-			if key == "Num1" || key == "Num2" {
+			if key == "Table1Num1" || key == "Table2Num3" {
 				Value := value.(float64)
 				values = append(values, fmt.Sprintf(`%v`, Value))
 			}
@@ -130,7 +164,7 @@ func BindTable1WithPg(
 		strValues := strings.Join(values, ",")
 		strFields := strings.Join(fields, ",")
 		query := fmt.Sprintf(`
-		INSERT INTO "Table1"(%v)
+		INSERT INTO "ViewSum1"(%v)
 			VALUES(%v);
 		`, strFields, strValues)
 		db.Exec(query)
@@ -143,10 +177,10 @@ func BindTable1WithPg(
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
 		params := (*requestParams).(map[string]interface{})
-		ID := params["ID"].(float64)
+		ID := params["ID"].(string)
 
 		query := fmt.Sprintf(`
-		DELETE FROM "Table1"
+		DELETE FROM "ViewSum1"
 			WHERE "ID"='%v';
 		`, ID)
 		db.Exec(query)
@@ -160,6 +194,6 @@ func BindTable1WithPg(
 		Delete: &deleteHandler,
 	}
 
-	BindArcaWithGrid(connStr, s, &g, &methods, "Table1")
+	BindArcaWithGrid(connStr, s, &g, &methods, "ViewSum1")
 	return &g
 }

@@ -132,7 +132,7 @@ function setupTable(tableid, rowid, source, fields, convertFn) {
             }
             row.removeEventListener('click', blockEdit, true);
             row.removeAttribute('disabled');
-            Object.keys(result).filter(key => key != 'ID').forEach(key => {
+            Object.keys(result).filter(key => key != 'ID' && key != 'CreatedAt').forEach(key => {
                 const cell = row.querySelector(`[key="${key}"]`);
                 cell.innerHTML = '';
                 processCell(row, key, result);
@@ -169,6 +169,18 @@ conn.onopen = () => {
             "ID": Number,
             "Num3": Number,
             "Num4": Number,
+        }
+    );
+    setupTable(
+        'ViewSum1',
+        'ViewSum1-row',
+        'ViewSum1',
+        ['ID', 'Table1Num1', 'Table2Num3', 'Sum13'],
+        {
+            "ID": String,
+            "Table1Num1": Number,
+            "Table2Num3": Number,
+            "Sum13": Number,
         }
     );
 }

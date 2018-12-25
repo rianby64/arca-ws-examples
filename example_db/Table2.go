@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"strings"
-	"time"
 
 	grid "github.com/rianby64/arca-grid"
 	arca "github.com/rianby64/arca-ws-jsonrpc"
@@ -18,11 +17,10 @@ func BindTable2WithPg(
 	db *sql.DB,
 ) *grid.Grid {
 
-	type AAURow struct {
-		ID        int64
-		Num3      float64
-		Num4      float64
-		CreatedAt time.Time
+	type Table2 struct {
+		ID   int64
+		Num3 float64
+		Num4 float64
 	}
 
 	g := grid.Grid{}
@@ -36,27 +34,24 @@ func BindTable2WithPg(
 		SELECT
 			"ID",
 			"Num3",
-			"Num4",
-			"CreatedAt"
+			"Num4"
 		FROM "Table2"
 		`)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		var results []AAURow
+		var results []Table2
 
 		var iID interface{}
 		var iNum3 interface{}
 		var iNum4 interface{}
-		var iCreatedAt interface{}
 
 		for rows.Next() {
 			err := rows.Scan(
 				&iID,
 				&iNum3,
 				&iNum4,
-				&iCreatedAt,
 			)
 			if err != nil {
 				log.Fatal(err)
@@ -65,7 +60,6 @@ func BindTable2WithPg(
 			var ID int64
 			var Num3 float64
 			var Num4 float64
-			var CreatedAt time.Time
 
 			if iID != nil {
 				ID = iID.(int64)
@@ -76,15 +70,11 @@ func BindTable2WithPg(
 			if iNum4 != nil {
 				Num4 = iNum4.(float64)
 			}
-			if iCreatedAt != nil {
-				CreatedAt = iCreatedAt.(time.Time)
-			}
 
-			results = append(results, AAURow{
-				ID:        ID,
-				Num3:      Num3,
-				Num4:      Num4,
-				CreatedAt: CreatedAt,
+			results = append(results, Table2{
+				ID:   ID,
+				Num3: Num3,
+				Num4: Num4,
 			})
 		}
 
@@ -170,6 +160,6 @@ func BindTable2WithPg(
 		Delete: &deleteHandler,
 	}
 
-	go BindArcaWithGrid(connStr, s, &g, &methods, "Table2")
+	BindArcaWithGrid(connStr, s, &g, &methods, "Table2")
 	return &g
 }
