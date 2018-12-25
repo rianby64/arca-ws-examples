@@ -1,27 +1,35 @@
 
-DROP FUNCTION IF EXISTS notify_jsonrpc CASCADE;
-CREATE FUNCTION notify_jsonrpc()
-    RETURNS trigger
+DROP FUNCTION IF EXISTS send_row_jsonrpc CASCADE;
+CREATE FUNCTION send_row_jsonrpc(source TEXT, method TEXT, row JSON)
+    RETURNS VOID
     LANGUAGE 'plpgsql'
     IMMUTABLE
 AS $$
 BEGIN
+PERFORM pg_notify('jsonrpc'::text, json_build_object(
+  'source', source,
+  'method', LOWER(method),
+  'result', row)::text);
+END;
+$$;
+
+DROP FUNCTION IF EXISTS notify_jsonrpc CASCADE;
+CREATE FUNCTION notify_jsonrpc()
+    RETURNS TRIGGER
+    LANGUAGE 'plpgsql'
+    IMMUTABLE
+AS $$
+DECLARE
+  rec RECORD;
+BEGIN
 IF (TG_OP = 'INSERT') THEN
-  PERFORM pg_notify('jsonrpc', json_build_object(
-    'source', TG_TABLE_NAME,
-    'method', LOWER(TG_OP),
-    'result', row_to_json(NEW))::text);
+  rec := NEW;
 ELSIF (TG_OP = 'DELETE') THEN
-  PERFORM pg_notify('jsonrpc', json_build_object(
-    'source', TG_TABLE_NAME,
-    'method', LOWER(TG_OP),
-    'result', row_to_json(OLD))::text);
+  rec := OLD;
 ELSIF (TG_OP = 'UPDATE') THEN
-  PERFORM pg_notify('jsonrpc', json_build_object(
-    'source', TG_TABLE_NAME,
-    'method', LOWER(TG_OP),
-    'result', row_to_json(NEW))::text);
+  rec := NEW;
 END IF;
+PERFORM send_row_jsonrpc(TG_TABLE_NAME, TG_OP, row_to_json(REC));
 RETURN NULL;
 END;
 $$;

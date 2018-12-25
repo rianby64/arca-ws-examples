@@ -105,7 +105,10 @@ func BindTable2WithPg(
 			SET %v
 			WHERE "ID"='%v';
 		`, strSetters, ID)
-		db.Exec(query)
+		_, err := db.Exec(query)
+		if err != nil {
+			log.Println(err)
+		}
 		return nil, nil
 	}
 
@@ -133,7 +136,10 @@ func BindTable2WithPg(
 		INSERT INTO "Table2"(%v)
 			VALUES(%v);
 		`, strFields, strValues)
-		db.Exec(query)
+		_, err := db.Exec(query)
+		if err != nil {
+			log.Println(err)
+		}
 		return nil, nil
 	}
 
@@ -149,7 +155,10 @@ func BindTable2WithPg(
 		DELETE FROM "Table2"
 			WHERE "ID"='%v';
 		`, ID)
-		db.Exec(query)
+		_, err := db.Exec(query)
+		if err != nil {
+			log.Println(err)
+		}
 		return nil, nil
 	}
 
