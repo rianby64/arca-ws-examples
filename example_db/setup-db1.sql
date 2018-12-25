@@ -7,17 +7,17 @@ CREATE FUNCTION notify_jsonrpc()
 AS $$
 BEGIN
 IF (TG_OP = 'INSERT') THEN
-    PERFORM pg_notify('jsonrpc', json_build_object(
+  PERFORM pg_notify('jsonrpc', json_build_object(
     'source', TG_TABLE_NAME,
     'method', LOWER(TG_OP),
     'result', row_to_json(NEW))::text);
 ELSIF (TG_OP = 'DELETE') THEN
-    PERFORM pg_notify('jsonrpc', json_build_object(
+  PERFORM pg_notify('jsonrpc', json_build_object(
     'source', TG_TABLE_NAME,
     'method', LOWER(TG_OP),
     'result', row_to_json(OLD))::text);
 ELSIF (TG_OP = 'UPDATE') THEN
-    PERFORM pg_notify('jsonrpc', json_build_object(
+  PERFORM pg_notify('jsonrpc', json_build_object(
     'source', TG_TABLE_NAME,
     'method', LOWER(TG_OP),
     'result', row_to_json(NEW))::text);
