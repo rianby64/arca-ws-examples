@@ -37,6 +37,7 @@ func BindTable2WithPg(
 			"Num3",
 			"Num4"
 		FROM "Table2"
+		ORDER BY "ID"
 		`)
 		if err != nil {
 			log.Fatal(err)

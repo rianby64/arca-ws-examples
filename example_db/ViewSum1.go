@@ -42,6 +42,7 @@ func BindViewSum1WithPg(
 			"Table2Num3",
 			"Sum13"
 		FROM "ViewSum1"
+		ORDER BY "Table1ID", "Table2ID"
 		`)
 		if err != nil {
 			log.Fatal(err)

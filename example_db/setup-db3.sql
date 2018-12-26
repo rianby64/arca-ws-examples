@@ -15,7 +15,7 @@ CREATE OR REPLACE VIEW "ViewSum2" AS (
 );
 
 CREATE OR REPLACE FUNCTION process_viewsum2()
-  RETURNS TRIGGER
+  RETURNS trigger
   LANGUAGE 'plpgsql'
   VOLATILE
 AS $$
@@ -42,6 +42,78 @@ CREATE TRIGGER "ViewSum2_process"
 INSTEAD OF INSERT OR UPDATE OR DELETE ON "ViewSum2"
 FOR EACH ROW
 EXECUTE PROCEDURE process_viewsum2();
+
+CREATE OR REPLACE FUNCTION notify_from_table1_viewsum2_before()
+  RETURNS TRIGGER
+  LANGUAGE plpgsql
+AS $$
+DECLARE
+  r RECORD;
+BEGIN
+IF (TG_OP = 'DELETE') THEN
+  FOR r IN (SELECT
+      'ViewSum2' AS source,
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      current_database() AS db
+    FROM (SELECT "ViewSum2".*
+      FROM "ViewSum2"
+      WHERE "Table1ID"=OLD."ID"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
+  RETURN OLD;
+ELSIF (TG_OP = 'UPDATE') THEN
+  RETURN NEW;
+ELSIF (TG_OP = 'INSERT') THEN
+  RETURN NEW;
+END IF;
+RETURN NULL;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION notify_from_table1_viewsum2_after()
+  RETURNS TRIGGER
+  LANGUAGE plpgsql
+AS $$
+DECLARE
+  r RECORD;
+BEGIN
+IF (TG_OP = 'DELETE') THEN
+  RETURN OLD;
+ELSIF (TG_OP = 'UPDATE') THEN
+  FOR r IN (SELECT
+      'ViewSum2' AS source,
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      current_database() AS db
+    FROM (SELECT "ViewSum2".*
+      FROM "ViewSum2"
+      WHERE "Table1ID"=NEW."ID"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
+  RETURN NEW;
+ELSIF (TG_OP = 'INSERT') THEN
+  FOR r IN (SELECT
+      'ViewSum2' AS source,
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      current_database() AS db
+    FROM (SELECT "ViewSum2".*
+      FROM "ViewSum2"
+      WHERE "Table1ID"=NEW."ID"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
+  RETURN NEW;
+END IF;
+RETURN NULL;
+END;
+$$;
 
 CREATE OR REPLACE FUNCTION notify_from_table2_viewsum2_before()
   RETURNS TRIGGER
@@ -114,6 +186,20 @@ END IF;
 RETURN NULL;
 END;
 $$;
+
+DROP TRIGGER IF EXISTS "Table1_notify_viewsum2_before" ON "Table1" CASCADE;
+CREATE TRIGGER "Table1_notify_viewsum2_before"
+  BEFORE INSERT OR UPDATE OR DELETE
+  ON "Table1"
+  FOR EACH ROW
+  EXECUTE PROCEDURE notify_from_table1_viewsum2_before();
+
+DROP TRIGGER IF EXISTS "Table1_notify_viewsum2_after" ON "Table1" CASCADE;
+CREATE TRIGGER "Table1_notify_viewsum2_after"
+  AFTER INSERT OR UPDATE OR DELETE
+  ON "Table1"
+  FOR EACH ROW
+  EXECUTE PROCEDURE notify_from_table1_viewsum2_after();
 
 DROP TRIGGER IF EXISTS "Table2_notify_viewsum2_before" ON "Table2" CASCADE;
 CREATE TRIGGER "Table2_notify_viewsum2_before"
