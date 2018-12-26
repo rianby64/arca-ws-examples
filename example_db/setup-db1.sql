@@ -1,3 +1,4 @@
+\set QUIET 1
 
 DROP FUNCTION IF EXISTS notify_jsonrpc CASCADE;
 CREATE OR REPLACE FUNCTION notify_jsonrpc()
@@ -17,7 +18,8 @@ ELSIF (TG_OP = 'UPDATE') THEN
 END IF;
 PERFORM pg_notify('jsonrpc', json_build_object(
   'source', TG_TABLE_NAME,
-  'method', LOWER(TG_OP),
+  'method', lower(TG_OP),
+  'db', current_database(),
   'result', row_to_json(rec))::text);
 RETURN NULL;
 END;

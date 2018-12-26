@@ -15,7 +15,7 @@ CREATE OR REPLACE VIEW "ViewSum2" AS (
 );
 
 CREATE OR REPLACE FUNCTION process_viewsum2()
-  RETURNS trigger
+  RETURNS TRIGGER
   LANGUAGE 'plpgsql'
   VOLATILE
 AS $$
@@ -53,8 +53,9 @@ BEGIN
 IF (TG_OP = 'DELETE') THEN
   FOR r IN (SELECT
       'ViewSum2' AS source,
-      LOWER(TG_OP) AS method,
-      row_to_json(t) AS result
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      current_database() AS db
     FROM (SELECT "ViewSum2".*
       FROM "ViewSum2"
       WHERE "Table2ID"=OLD."ID"
@@ -84,8 +85,9 @@ IF (TG_OP = 'DELETE') THEN
 ELSIF (TG_OP = 'UPDATE') THEN
   FOR r IN (SELECT
       'ViewSum2' AS source,
-      LOWER(TG_OP) AS method,
-      row_to_json(t) AS result
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      current_database() AS db
     FROM (SELECT "ViewSum2".*
       FROM "ViewSum2"
       WHERE "Table2ID"=NEW."ID"
@@ -97,8 +99,9 @@ ELSIF (TG_OP = 'UPDATE') THEN
 ELSIF (TG_OP = 'INSERT') THEN
   FOR r IN (SELECT
       'ViewSum2' AS source,
-      LOWER(TG_OP) AS method,
-      row_to_json(t) AS result
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      current_database() AS db
     FROM (SELECT "ViewSum2".*
       FROM "ViewSum2"
       WHERE "Table2ID"=NEW."ID"

@@ -34,6 +34,7 @@ func BindArcaWithGrid(
 	type pgNotifyJSONRPC struct {
 		Method string
 		Source string
+		Db     string
 		Result interface{}
 	}
 
@@ -59,16 +60,23 @@ func BindArcaWithGrid(
 			}
 			var notification pgNotifyJSONRPC
 			payload := []byte(msg.Extra)
-			json.Unmarshal(payload, &notification)
+
+			err := json.Unmarshal(payload, &notification)
+			if err != nil {
+				log.Println(err, ":: Notification ERROR")
+			}
 
 			var context interface{} = map[string]string{
-				"source": notification.Source,
+				"Source": notification.Source,
+				"Db":     notification.Db,
 			}
 			var response arca.JSONRPCresponse
 
 			response.Method = notification.Method
 			response.Context = context
 			response.Result = notification.Result
+
+			log.Println(response, ":: Notification")
 
 			s.Broadcast(&response)
 		}

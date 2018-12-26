@@ -15,6 +15,7 @@ func BindTable2WithPg(
 	s *arca.JSONRPCExtensionWS,
 	connStr string,
 	db *sql.DB,
+	mirrors *[]*sql.DB,
 ) *grid.Grid {
 
 	type Table2 struct {
@@ -109,6 +110,12 @@ func BindTable2WithPg(
 		if err != nil {
 			log.Println(err)
 		}
+		for _, mirror := range *mirrors {
+			_, err := mirror.Exec(query)
+			if err != nil {
+				log.Println(err)
+			}
+		}
 		return nil, nil
 	}
 
@@ -140,6 +147,12 @@ func BindTable2WithPg(
 		if err != nil {
 			log.Println(err)
 		}
+		for _, mirror := range *mirrors {
+			_, err := mirror.Exec(query)
+			if err != nil {
+				log.Println(err)
+			}
+		}
 		return nil, nil
 	}
 
@@ -158,6 +171,12 @@ func BindTable2WithPg(
 		_, err := db.Exec(query)
 		if err != nil {
 			log.Println(err)
+		}
+		for _, mirror := range *mirrors {
+			_, err := mirror.Exec(query)
+			if err != nil {
+				log.Println(err)
+			}
 		}
 		return nil, nil
 	}

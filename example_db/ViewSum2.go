@@ -136,7 +136,10 @@ func BindViewSum2WithPg(
 			SET %v
 			WHERE "ID"='%v';
 		`, strSetters, ID)
-		db.Exec(query)
+		_, err := db.Exec(query)
+		if err != nil {
+			log.Println(err)
+		}
 		return nil, nil
 	}
 
@@ -167,7 +170,10 @@ func BindViewSum2WithPg(
 		INSERT INTO "ViewSum2"(%v)
 			VALUES(%v);
 		`, strFields, strValues)
-		db.Exec(query)
+		_, err := db.Exec(query)
+		if err != nil {
+			log.Println(err)
+		}
 		return nil, nil
 	}
 
@@ -183,7 +189,10 @@ func BindViewSum2WithPg(
 		DELETE FROM "ViewSum2"
 			WHERE "ID"='%v';
 		`, ID)
-		db.Exec(query)
+		_, err := db.Exec(query)
+		if err != nil {
+			log.Println(err)
+		}
 		return nil, nil
 	}
 

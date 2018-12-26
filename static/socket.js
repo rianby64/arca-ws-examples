@@ -4,7 +4,7 @@ conn.messageHandlers = {};
 
 conn.onmessage = (e) => {
     const data = JSON.parse(e.data);
-    const handler = conn.messageHandlers[data.Context.source] || function() {};
+    const handler = conn.messageHandlers[data.Context.Source] || function() {};
     handler(data);
 }
 
@@ -15,7 +15,7 @@ const blockEdit = (e) => {
 };
 
 // Need to implement some Redux here in this thing...
-function setupTable(tableid, rowid, source, fields, convertFn) {
+function setupTable(tableid, rowid, Source, fields, convertFn) {
     const table = document.querySelector(`#${tableid}`);
     const tbody = table.querySelector('tbody');
     const insertButton = table.querySelector('[action="insert"]');
@@ -71,7 +71,7 @@ function setupTable(tableid, rowid, source, fields, convertFn) {
             }
             conn.send(JSON.stringify({...fd,
                 Context: {
-                    source
+                    Source
                 }
             }));
         });
@@ -93,7 +93,7 @@ function setupTable(tableid, rowid, source, fields, convertFn) {
                         ID: convertFn["ID"](id)
                     },
                     Context: {
-                        source
+                        Source
                     }
                 }));
             }
@@ -109,7 +109,7 @@ function setupTable(tableid, rowid, source, fields, convertFn) {
         insertButton.insertingNew = true;
     });
 
-    conn.messageHandlers[source] = (data) => {
+    conn.messageHandlers[Source] = (data) => {
         const result = data.Result;
         if (data.Method === 'delete') {
             let row = tbody.querySelector(`tr[id="${result.ID}"]`);
@@ -118,7 +118,7 @@ function setupTable(tableid, rowid, source, fields, convertFn) {
             }
             return
         }
-        if (data.ID === `id-for-${source}`) {
+        if (data.ID === `id-for-${Source}`) {
             result.forEach(element => tbody.appendChild(processRow(element)));
         } else {
             let row = tbody.querySelector(`tr[id="${result.ID}"]`);
@@ -141,18 +141,15 @@ function setupTable(tableid, rowid, source, fields, convertFn) {
     };
     conn.send(JSON.stringify({
         Method: 'read',
-        ID: `id-for-${source}`,
+        ID: `id-for-${Source}`,
         Context: {
-            source
+            Source
         }
     }));
 }
 
 conn.onopen = () => {
-    setupTable(
-        'Table1',
-        'Table1-row',
-        'Table1',
+    setupTable('Table1', 'Table1-row', 'Table1',
         ['ID', 'Num1', 'Num2'],
         {
             "ID": Number,
@@ -160,10 +157,7 @@ conn.onopen = () => {
             "Num2": Number,
         }
     );
-    setupTable(
-        'Table2',
-        'Table2-row',
-        'Table2',
+    setupTable('Table2', 'Table2-row', 'Table2',
         ['ID', 'Num3', 'Num4'],
         {
             "ID": Number,
@@ -171,10 +165,7 @@ conn.onopen = () => {
             "Num4": Number,
         }
     );
-    setupTable(
-        'ViewSum1',
-        'ViewSum1-row',
-        'ViewSum1',
+    setupTable('ViewSum1', 'ViewSum1-row', 'ViewSum1',
         ['ID', 'Table1Num1', 'Table2Num3', 'Sum13'],
         {
             "ID": String,
@@ -183,10 +174,7 @@ conn.onopen = () => {
             "Sum13": Number,
         }
     );
-    setupTable(
-        'ViewSum2',
-        'ViewSum2-row',
-        'ViewSum2',
+    setupTable('ViewSum2', 'ViewSum2-row', 'ViewSum2',
         ['ID', 'Table1Num2', 'Table2Num4', 'Sum24'],
         {
             "ID": String,
