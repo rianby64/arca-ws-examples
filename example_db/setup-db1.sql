@@ -20,6 +20,7 @@ PERFORM pg_notify('jsonrpc', json_build_object(
   'source', TG_TABLE_NAME,
   'method', lower(TG_OP),
   'db', current_database(),
+  'primary', TRUE,
   'result', row_to_json(rec))::text);
 RETURN NULL;
 END;

@@ -16,7 +16,6 @@ func BindTable1WithPg(
 	connStr string,
 	db *sql.DB,
 	dbName string,
-	mirrors *[]*sql.DB,
 ) *grid.Grid {
 
 	type Table1 struct {

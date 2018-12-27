@@ -45,10 +45,11 @@ func ConnectNotifyWithArca(
 	*/
 
 	type pgNotifyJSONRPC struct {
-		Method string
-		Source string
-		Db     string
-		Result interface{}
+		Method  string
+		Source  string
+		Db      string
+		Primary bool
+		Result  interface{}
 	}
 
 	reportProblem := func(_ pq.ListenerEventType, err error) {
@@ -79,9 +80,10 @@ func ConnectNotifyWithArca(
 				log.Println(err, ":: Notification ERROR")
 			}
 
-			var context interface{} = map[string]string{
-				"Source": notification.Source,
-				"Db":     notification.Db,
+			var context interface{} = map[string]interface{}{
+				"Source":  notification.Source,
+				"Db":      notification.Db,
+				"Primary": notification.Primary,
 			}
 			var response arca.JSONRPCresponse
 
@@ -89,9 +91,21 @@ func ConnectNotifyWithArca(
 			response.Context = context
 			response.Result = notification.Result
 
-			log.Println(dbName, response, ":: Notification")
+			request := arca.JSONRPCrequest{}
+			request.Method = notification.Method
+			request.Context = map[string]interface{}{
+				"Source": notification.Source,
+				"Db":     notification.Db,
+			}
+			request.Params = notification.Result
 
-			s.Broadcast(&response)
+			if notification.Primary {
+				log.Println("request:: ", request, dbName, notification.Db)
+				// s.ProcessRequest(request) // WANT TO HAVE THIS FUNCTION AVAILABLE
+			} else {
+				s.Broadcast(&response)
+			}
+
 		}
 	})()
 }
