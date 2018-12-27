@@ -23,6 +23,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	mirrors = append(mirrors, db1)
 	example.BindTable1WithPg(&ws, connStr1, db1, dbName1, &mirrors)
 	example.BindTable2WithPg(&ws, connStr1, db1, dbName1, &mirrors)
 
@@ -34,8 +35,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	example.BindViewSum1WithPg(&ws, connStr2, db2, dbName2)
 	mirrors = append(mirrors, db2)
+	example.BindViewSum1WithPg(&ws, connStr2, db2, dbName2)
 
 	dbName3 := "arca-3"
 	connStr3 := fmt.Sprintf(
@@ -45,8 +46,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	example.BindViewSum2WithPg(&ws, connStr3, db3, dbName2)
 	mirrors = append(mirrors, db3)
+	example.BindViewSum2WithPg(&ws, connStr3, db3, dbName2)
 
 	http.HandleFunc("/ws", ws.Handle)
 	http.Handle("/", http.FileServer(http.Dir("./static")))

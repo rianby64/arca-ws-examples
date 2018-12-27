@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS "Table1"
 
 TRUNCATE "Table1";
 INSERT INTO "Table1"("Num1", "Num2")
-  VALUES (1.0, 1.0), (2.0, 2.0);
+  VALUES (1.0, 2.0), (3.0, 4.0);
 
 DROP TRIGGER IF EXISTS "Table1_notify" ON "Table1" CASCADE;
 CREATE TRIGGER "Table1_notify"
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS "Table2"
 
 TRUNCATE "Table2";
 INSERT INTO "Table2"("Num3", "Num4")
-  VALUES (1.0, 1.0), (2.0, 2.0);
+  VALUES (5.0, 6.0), (7.0, 8.0);
 
 DROP TRIGGER IF EXISTS "Table2_notify" ON "Table2" CASCADE;
 CREATE TRIGGER "Table2_notify"

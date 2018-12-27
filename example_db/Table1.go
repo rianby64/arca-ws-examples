@@ -115,12 +115,14 @@ func BindTable1WithPg(
 		if err != nil {
 			log.Println(err)
 		}
-		for _, mirror := range *mirrors {
-			_, err := mirror.Exec(query)
-			if err != nil {
-				log.Println(err)
+		/*
+			for _, mirror := range *mirrors {
+				_, err := mirror.Exec(query)
+				if err != nil {
+					log.Println(err)
+				}
 			}
-		}
+		*/
 		return nil, nil
 	}
 
@@ -152,12 +154,14 @@ func BindTable1WithPg(
 		if err != nil {
 			log.Println(err)
 		}
-		for _, mirror := range *mirrors {
-			_, err := mirror.Exec(query)
-			if err != nil {
-				log.Println(err)
+		/*
+			for _, mirror := range *mirrors {
+				_, err := mirror.Exec(query)
+				if err != nil {
+					log.Println(err)
+				}
 			}
-		}
+		*/
 		return nil, nil
 	}
 
@@ -177,12 +181,14 @@ func BindTable1WithPg(
 		if err != nil {
 			log.Println(err)
 		}
-		for _, mirror := range *mirrors {
-			_, err := mirror.Exec(query)
-			if err != nil {
-				log.Println(err)
+		/*
+			for _, mirror := range *mirrors {
+				_, err := mirror.Exec(query)
+				if err != nil {
+					log.Println(err)
+				}
 			}
-		}
+		*/
 		return nil, nil
 	}
 

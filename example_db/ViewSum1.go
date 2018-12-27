@@ -19,6 +19,7 @@ func BindViewSum1WithPg(
 	connStr string,
 	db *sql.DB,
 	dbName string,
+	mirrors *[]*sql.DB,
 ) *grid.Grid {
 
 	type ViewSum1 struct {
