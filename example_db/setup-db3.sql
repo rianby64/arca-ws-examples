@@ -51,14 +51,16 @@ DECLARE
   r RECORD;
 BEGIN
 IF (TG_OP = 'DELETE') THEN
-  FOR r IN (SELECT
+  FOR r IN (
+    SELECT
       'ViewSum2' AS source,
       lower(TG_OP) AS method,
       row_to_json(t) AS result,
       current_database() AS db
-    FROM (SELECT "ViewSum2".*
-      FROM "ViewSum2"
-      WHERE "Table1ID"=OLD."ID"
+    FROM (
+      SELECT *
+        FROM "ViewSum2"
+        WHERE "Table1ID"=OLD."ID"
     ) t
   ) LOOP
     PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
@@ -83,28 +85,32 @@ BEGIN
 IF (TG_OP = 'DELETE') THEN
   RETURN OLD;
 ELSIF (TG_OP = 'UPDATE') THEN
-  FOR r IN (SELECT
+  FOR r IN (
+    SELECT
       'ViewSum2' AS source,
       lower(TG_OP) AS method,
       row_to_json(t) AS result,
       current_database() AS db
-    FROM (SELECT "ViewSum2".*
-      FROM "ViewSum2"
-      WHERE "Table1ID"=NEW."ID"
+    FROM (
+      SELECT *
+        FROM "ViewSum2"
+        WHERE "Table1ID"=NEW."ID"
     ) t
   ) LOOP
     PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
   END LOOP;
   RETURN NEW;
 ELSIF (TG_OP = 'INSERT') THEN
-  FOR r IN (SELECT
+  FOR r IN (
+    SELECT
       'ViewSum2' AS source,
       lower(TG_OP) AS method,
       row_to_json(t) AS result,
       current_database() AS db
-    FROM (SELECT "ViewSum2".*
-      FROM "ViewSum2"
-      WHERE "Table1ID"=NEW."ID"
+    FROM (
+      SELECT *
+        FROM "ViewSum2"
+        WHERE "Table1ID"=NEW."ID"
     ) t
   ) LOOP
     PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
@@ -123,14 +129,16 @@ DECLARE
   r RECORD;
 BEGIN
 IF (TG_OP = 'DELETE') THEN
-  FOR r IN (SELECT
+  FOR r IN (
+    SELECT
       'ViewSum2' AS source,
       lower(TG_OP) AS method,
       row_to_json(t) AS result,
       current_database() AS db
-    FROM (SELECT "ViewSum2".*
-      FROM "ViewSum2"
-      WHERE "Table2ID"=OLD."ID"
+    FROM (
+      SELECT *
+        FROM "ViewSum2"
+        WHERE "Table2ID"=OLD."ID"
     ) t
   ) LOOP
     PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
@@ -155,28 +163,32 @@ BEGIN
 IF (TG_OP = 'DELETE') THEN
   RETURN OLD;
 ELSIF (TG_OP = 'UPDATE') THEN
-  FOR r IN (SELECT
+  FOR r IN (
+    SELECT
       'ViewSum2' AS source,
       lower(TG_OP) AS method,
       row_to_json(t) AS result,
       current_database() AS db
-    FROM (SELECT "ViewSum2".*
-      FROM "ViewSum2"
-      WHERE "Table2ID"=NEW."ID"
+    FROM (
+      SELECT *
+        FROM "ViewSum2"
+        WHERE "Table2ID"=NEW."ID"
     ) t
   ) LOOP
     PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
   END LOOP;
   RETURN NEW;
 ELSIF (TG_OP = 'INSERT') THEN
-  FOR r IN (SELECT
+  FOR r IN (
+    SELECT
       'ViewSum2' AS source,
       lower(TG_OP) AS method,
       row_to_json(t) AS result,
       current_database() AS db
-    FROM (SELECT "ViewSum2".*
-      FROM "ViewSum2"
-      WHERE "Table2ID"=NEW."ID"
+    FROM (
+      SELECT *
+        FROM "ViewSum2"
+        WHERE "Table2ID"=NEW."ID"
     ) t
   ) LOOP
     PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
