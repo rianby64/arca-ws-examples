@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -14,28 +15,37 @@ func main() {
 
 	mirrors := []*sql.DB{}
 
-	connStr1 := "user=arca password=arca dbname=arca-1 sslmode=disable"
+	dbName1 := "arca-1"
+	connStr1 := fmt.Sprintf(
+		"user=arca password=arca dbname=%v sslmode=disable",
+		dbName1)
 	db1, err := sql.Open("postgres", connStr1)
 	if err != nil {
 		log.Fatal(err)
 	}
-	example.BindTable1WithPg(&ws, connStr1, db1, &mirrors)
-	example.BindTable2WithPg(&ws, connStr1, db1, &mirrors)
+	example.BindTable1WithPg(&ws, connStr1, db1, dbName1, &mirrors)
+	example.BindTable2WithPg(&ws, connStr1, db1, dbName1, &mirrors)
 
-	connStr2 := "user=arca password=arca dbname=arca-2 sslmode=disable"
+	dbName2 := "arca-2"
+	connStr2 := fmt.Sprintf(
+		"user=arca password=arca dbname=%v sslmode=disable",
+		dbName2)
 	db2, err := sql.Open("postgres", connStr2)
 	if err != nil {
 		log.Fatal(err)
 	}
-	example.BindViewSum1WithPg(&ws, connStr2, db2)
+	example.BindViewSum1WithPg(&ws, connStr2, db2, dbName2)
 	mirrors = append(mirrors, db2)
 
-	connStr3 := "user=arca password=arca dbname=arca-3 sslmode=disable"
+	dbName3 := "arca-3"
+	connStr3 := fmt.Sprintf(
+		"user=arca password=arca dbname=%v sslmode=disable",
+		dbName3)
 	db3, err := sql.Open("postgres", connStr3)
 	if err != nil {
 		log.Fatal(err)
 	}
-	example.BindViewSum2WithPg(&ws, connStr3, db3)
+	example.BindViewSum2WithPg(&ws, connStr3, db3, dbName2)
 	mirrors = append(mirrors, db3)
 
 	http.HandleFunc("/ws", ws.Handle)

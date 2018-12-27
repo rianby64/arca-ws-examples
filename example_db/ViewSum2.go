@@ -2,10 +2,13 @@ package example
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
+	"github.com/lib/pq"
 	grid "github.com/rianby64/arca-grid"
 	arca "github.com/rianby64/arca-ws-jsonrpc"
 )
@@ -15,6 +18,7 @@ func BindViewSum2WithPg(
 	s *arca.JSONRPCExtensionWS,
 	connStr string,
 	db *sql.DB,
+	dbName string,
 ) *grid.Grid {
 
 	type ViewSum2 struct {
@@ -205,5 +209,61 @@ func BindViewSum2WithPg(
 	}
 
 	BindArcaWithGrid(connStr, s, &g, &methods, "ViewSum2")
+
+	/*
+		Here I have to handle the way to redirect the notifications...
+		Still I'm exploring
+	*/
+
+	type pgNotifyJSONRPC struct {
+		Method string
+		Source string
+		Db     string
+		Result interface{}
+	}
+
+	reportProblem := func(_ pq.ListenerEventType, err error) {
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+
+	minReconn := 10 * time.Second
+	maxReconn := time.Minute
+	listener := pq.NewListener(connStr, minReconn, maxReconn, reportProblem)
+	err := listener.Listen("jsonrpc")
+	if err != nil {
+		panic(err)
+	}
+
+	go (func() {
+		for {
+			msg, ok := <-listener.Notify
+			if !ok {
+				return
+			}
+			var notification pgNotifyJSONRPC
+			payload := []byte(msg.Extra)
+
+			err := json.Unmarshal(payload, &notification)
+			if err != nil {
+				log.Println(err, ":: Notification ERROR")
+			}
+
+			var context interface{} = map[string]string{
+				"Source": notification.Source,
+				"Db":     notification.Db,
+			}
+			var response arca.JSONRPCresponse
+
+			response.Method = notification.Method
+			response.Context = context
+			response.Result = notification.Result
+
+			log.Println(dbName, response, ":: Notification")
+
+			s.Broadcast(&response)
+		}
+	})()
 	return &g
 }
