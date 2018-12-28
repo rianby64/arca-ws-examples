@@ -36,7 +36,7 @@ func BindArcaWithGrid(
 // ConnectNotifyWithArca whatever
 func ConnectNotifyWithArca(
 	connStr string,
-	dbName string,
+	dbName string, dbNamePrimary string,
 	s *arca.JSONRPCExtensionWS,
 	dbs *map[string]*sql.DB,
 ) {
@@ -101,7 +101,6 @@ func ConnectNotifyWithArca(
 			}
 			request.Params = notification.Result
 
-			log.Println("notification:: ", notification, dbName)
 			if notification.Primary {
 				log.Println("request:: ", request, dbName, notification.Db)
 				for dbNameContext := range *dbs {
@@ -111,9 +110,14 @@ func ConnectNotifyWithArca(
 						s.ProcessRequest(&request)
 					}
 				}
-
+				if dbName == dbNamePrimary {
+					s.Broadcast(&response)
+					log.Println("notification:: ", notification, dbName)
+				}
+			} else {
+				s.Broadcast(&response)
+				log.Println("notification:: ", notification, dbName)
 			}
-			s.Broadcast(&response)
 
 		}
 	})()

@@ -23,7 +23,7 @@ func main() {
 		log.Fatal(err)
 	}
 	dbs[dbName1] = db1
-	example.ConnectNotifyWithArca(connStr1, dbName1, &ws, &dbs)
+	example.ConnectNotifyWithArca(connStr1, dbName1, dbName1, &ws, &dbs)
 
 	dbName2 := "arca-2"
 	connStr2 := fmt.Sprintf(
@@ -34,7 +34,7 @@ func main() {
 		log.Fatal(err)
 	}
 	dbs[dbName2] = db2
-	example.ConnectNotifyWithArca(connStr2, dbName2, &ws, &dbs)
+	example.ConnectNotifyWithArca(connStr2, dbName2, dbName1, &ws, &dbs)
 
 	dbName3 := "arca-3"
 	connStr3 := fmt.Sprintf(
@@ -45,7 +45,7 @@ func main() {
 		log.Fatal(err)
 	}
 	dbs[dbName3] = db3
-	example.ConnectNotifyWithArca(connStr3, dbName3, &ws, &dbs)
+	example.ConnectNotifyWithArca(connStr3, dbName3, dbName1, &ws, &dbs)
 
 	example.BindTable1WithPg(&ws, connStr1, dbName1, &dbs)
 	example.BindTable2WithPg(&ws, connStr1, dbName1, &dbs)
