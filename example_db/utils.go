@@ -41,11 +41,6 @@ func ConnectNotifyWithArca(
 	dbs *map[string]*sql.DB,
 ) {
 
-	/*
-		Here I have to handle the way to redirect the notifications...
-		Still I'm exploring
-	*/
-
 	type pgNotifyJSONRPC struct {
 		Method  string
 		Source  string
@@ -104,15 +99,20 @@ func ConnectNotifyWithArca(
 			log.Println("notification ::", dbName, notification)
 			if notification.Primary {
 				log.Println("request ::", dbName, notification.Db, request)
+				if notification.Db != dbNamePrimary {
+					log.Println("processing a change from a view")
+					request.Context.(map[string]interface{})["Db"] = dbNamePrimary
+					log.Println("database ::", notification.Db, request)
+					s.ProcessRequest(&request)
+					return
+				}
+				log.Println("processing a change from a primary table")
 				for dbNameContext := range *dbs {
-					if dbNameContext != notification.Db {
+					if dbNameContext != dbNamePrimary {
 						request.Context.(map[string]interface{})["Db"] = dbNameContext
 						log.Println("database ::", dbNameContext, notification.Db, request)
 						s.ProcessRequest(&request)
 					}
-				}
-				if dbName != dbNamePrimary {
-					return
 				}
 			}
 			s.Broadcast(&response)

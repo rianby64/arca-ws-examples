@@ -19,17 +19,43 @@ CREATE OR REPLACE FUNCTION process_viewsum2()
   LANGUAGE 'plpgsql'
   VOLATILE
 AS $$
+DECLARE
+  r RECORD;
 BEGIN
 IF TG_OP = 'UPDATE' THEN
   IF (NEW."Table1Num2" <> OLD."Table1Num2") THEN
-    UPDATE "Table1"
-      SET "Num2"=NEW."Table1Num2"
-      WHERE "ID"=NEW."Table1ID";
+    FOR r IN (
+      SELECT
+        'Table1' AS source,
+        lower(TG_OP) AS method,
+        row_to_json(t) AS result,
+        TRUE AS primary,
+        current_database() AS db
+      FROM (
+        SELECT
+          NEW."Table1ID" AS "ID",
+          NEW."Table1Num2" AS "Num2"
+      ) t
+    ) LOOP
+      PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+    END LOOP;
   END IF;
   IF (NEW."Table2Num4" <> OLD."Table2Num4") THEN
-    UPDATE "Table2"
-      SET "Num4"=NEW."Table2Num4"
-      WHERE "ID"=NEW."Table2ID";
+    FOR r IN (
+      SELECT
+        'Table2' AS source,
+        lower(TG_OP) AS method,
+        row_to_json(t) AS result,
+        TRUE AS primary,
+        current_database() AS db
+      FROM (
+        SELECT
+          NEW."Table2ID" AS "ID",
+          NEW."Table2Num4" AS "Num4"
+      ) t
+    ) LOOP
+      PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+    END LOOP;
   END IF;
   RETURN NEW;
 END IF;
@@ -226,3 +252,6 @@ CREATE TRIGGER "Table2_notify_viewsum2_after"
   ON "Table2"
   FOR EACH ROW
   EXECUTE PROCEDURE notify_from_table2_viewsum2_after();
+
+DROP TRIGGER IF EXISTS "Table1_notify" ON "Table1" CASCADE;
+DROP TRIGGER IF EXISTS "Table2_notify" ON "Table2" CASCADE;
