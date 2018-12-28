@@ -14,8 +14,8 @@ import (
 func BindTable1WithPg(
 	s *arca.JSONRPCExtensionWS,
 	connStr string,
-	db *sql.DB,
 	dbName string,
+	dbs *map[string]*sql.DB,
 ) *grid.Grid {
 
 	type Table1 struct {
@@ -31,6 +31,7 @@ func BindTable1WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
+		db := (*dbs)[dbName]
 		rows, err := db.Query(`
 		SELECT
 			"ID",
@@ -89,6 +90,15 @@ func BindTable1WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
+		var db *sql.DB
+		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
+		if ok {
+			db = (*dbs)[dbNameContext.(string)]
+			log.Println("update Table1 via context ::", dbNameContext.(string))
+		} else {
+			db = (*dbs)[dbName]
+			log.Println("update Table1 by default ::", dbName)
+		}
 		params := (*requestParams).(map[string]interface{})
 		setters := []string{}
 		for key, value := range params {
@@ -111,14 +121,6 @@ func BindTable1WithPg(
 		if err != nil {
 			log.Println(err)
 		}
-		/*
-			for _, mirror := range *mirrors {
-				_, err := mirror.Exec(query)
-				if err != nil {
-					log.Println(err)
-				}
-			}
-		*/
 		return nil, nil
 	}
 
@@ -127,6 +129,7 @@ func BindTable1WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
+		db := (*dbs)[dbName]
 		params := (*requestParams).(map[string]interface{})
 		fields := []string{}
 		values := []string{}
@@ -150,14 +153,6 @@ func BindTable1WithPg(
 		if err != nil {
 			log.Println(err)
 		}
-		/*
-			for _, mirror := range *mirrors {
-				_, err := mirror.Exec(query)
-				if err != nil {
-					log.Println(err)
-				}
-			}
-		*/
 		return nil, nil
 	}
 
@@ -166,6 +161,7 @@ func BindTable1WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
+		db := (*dbs)[dbName]
 		params := (*requestParams).(map[string]interface{})
 		ID := params["ID"].(float64)
 
@@ -177,14 +173,6 @@ func BindTable1WithPg(
 		if err != nil {
 			log.Println(err)
 		}
-		/*
-			for _, mirror := range *mirrors {
-				_, err := mirror.Exec(query)
-				if err != nil {
-					log.Println(err)
-				}
-			}
-		*/
 		return nil, nil
 	}
 

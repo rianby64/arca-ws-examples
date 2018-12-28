@@ -14,8 +14,8 @@ import (
 func BindViewSum2WithPg(
 	s *arca.JSONRPCExtensionWS,
 	connStr string,
-	db *sql.DB,
 	dbName string,
+	dbs *map[string]*sql.DB,
 ) *grid.Grid {
 
 	type ViewSum2 struct {
@@ -34,6 +34,7 @@ func BindViewSum2WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
+		db := (*dbs)[dbName]
 		rows, err := db.Query(`
 		SELECT
 			"ID",
@@ -116,6 +117,15 @@ func BindViewSum2WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
+		var db *sql.DB
+		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
+		if ok {
+			db = (*dbs)[dbNameContext.(string)]
+			log.Println("update Table1 via context ::", dbNameContext.(string))
+		} else {
+			db = (*dbs)[dbName]
+			log.Println("update Table1 by default ::", dbName)
+		}
 		params := (*requestParams).(map[string]interface{})
 		setters := []string{}
 		for key, value := range params {
@@ -150,6 +160,7 @@ func BindViewSum2WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
+		db := (*dbs)[dbName]
 		params := (*requestParams).(map[string]interface{})
 		fields := []string{}
 		values := []string{}
@@ -184,6 +195,7 @@ func BindViewSum2WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
+		db := (*dbs)[dbName]
 		params := (*requestParams).(map[string]interface{})
 		ID := params["ID"].(string)
 

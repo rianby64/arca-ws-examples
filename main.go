@@ -12,6 +12,7 @@ import (
 
 func main() {
 	ws := arca.JSONRPCExtensionWS{}
+	dbs := map[string]*sql.DB{}
 
 	dbName1 := "arca-1"
 	connStr1 := fmt.Sprintf(
@@ -21,9 +22,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	example.ConnectNotifyWithArca(connStr1, dbName1, &ws)
-	example.BindTable1WithPg(&ws, connStr1, db1, dbName1)
-	example.BindTable2WithPg(&ws, connStr1, db1, dbName1)
+	dbs[dbName1] = db1
+	example.ConnectNotifyWithArca(connStr1, dbName1, &ws, &dbs)
 
 	dbName2 := "arca-2"
 	connStr2 := fmt.Sprintf(
@@ -33,8 +33,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	example.ConnectNotifyWithArca(connStr2, dbName2, &ws)
-	example.BindViewSum1WithPg(&ws, connStr2, db2, dbName2)
+	dbs[dbName2] = db2
+	example.ConnectNotifyWithArca(connStr2, dbName2, &ws, &dbs)
 
 	dbName3 := "arca-3"
 	connStr3 := fmt.Sprintf(
@@ -44,8 +44,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	example.ConnectNotifyWithArca(connStr3, dbName3, &ws)
-	example.BindViewSum2WithPg(&ws, connStr3, db3, dbName2)
+	dbs[dbName3] = db3
+	example.ConnectNotifyWithArca(connStr3, dbName3, &ws, &dbs)
+
+	example.BindTable1WithPg(&ws, connStr1, dbName1, &dbs)
+	example.BindTable2WithPg(&ws, connStr1, dbName1, &dbs)
+	example.BindViewSum1WithPg(&ws, connStr2, dbName2, &dbs)
+	example.BindViewSum2WithPg(&ws, connStr3, dbName3, &dbs)
 
 	http.HandleFunc("/ws", ws.Handle)
 	http.Handle("/", http.FileServer(http.Dir("./static")))

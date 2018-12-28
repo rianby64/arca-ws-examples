@@ -1,6 +1,7 @@
 package example
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"time"
@@ -37,6 +38,7 @@ func ConnectNotifyWithArca(
 	connStr string,
 	dbName string,
 	s *arca.JSONRPCExtensionWS,
+	dbs *map[string]*sql.DB,
 ) {
 
 	/*
@@ -99,12 +101,19 @@ func ConnectNotifyWithArca(
 			}
 			request.Params = notification.Result
 
+			log.Println("notification:: ", notification, dbName)
 			if notification.Primary {
 				log.Println("request:: ", request, dbName, notification.Db)
-				// s.ProcessRequest(request) // WANT TO HAVE THIS FUNCTION AVAILABLE
-			} else {
-				s.Broadcast(&response)
+				for dbNameContext := range *dbs {
+					if dbNameContext != notification.Db {
+						request.Context.(map[string]interface{})["Db"] = dbNameContext
+						log.Println(dbNameContext, notification.Db, ":: database", request)
+						s.ProcessRequest(&request)
+					}
+				}
+
 			}
+			s.Broadcast(&response)
 
 		}
 	})()
