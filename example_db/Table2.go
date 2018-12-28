@@ -90,14 +90,13 @@ func BindTable2WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
+		log.Println("handler ::", *requestParams, *context)
 		var db *sql.DB
 		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
 		if ok {
 			db = (*dbs)[dbNameContext.(string)]
-			log.Println("update Table1 via context ::", dbNameContext.(string))
 		} else {
 			db = (*dbs)[dbName]
-			log.Println("update Table1 by default ::", dbName)
 		}
 		params := (*requestParams).(map[string]interface{})
 		setters := []string{}
@@ -129,12 +128,19 @@ func BindTable2WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
-		db := (*dbs)[dbName]
+		log.Println("handler ::", *requestParams, *context)
+		var db *sql.DB
+		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
+		if ok {
+			db = (*dbs)[dbNameContext.(string)]
+		} else {
+			db = (*dbs)[dbName]
+		}
 		params := (*requestParams).(map[string]interface{})
 		fields := []string{}
 		values := []string{}
 		for key, value := range params {
-			if key == "ID" {
+			if key == "ID" || key == "CreatedAt" {
 				continue
 			}
 			fields = append(fields, fmt.Sprintf(`"%v"`, key))
@@ -161,6 +167,7 @@ func BindTable2WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
+		log.Println("handler ::", *requestParams, *context)
 		var db *sql.DB
 		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
 		if ok {

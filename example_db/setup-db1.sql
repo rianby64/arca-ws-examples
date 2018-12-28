@@ -8,36 +8,20 @@ CREATE OR REPLACE FUNCTION notify_jsonrpc()
 AS $$
 DECLARE
   rec RECORD;
-  cmp RECORD;
-  msg TEXT;
-  tst TEXT;
 BEGIN
 IF (TG_OP = 'INSERT') THEN
   rec := NEW;
-  cmp := OLD;
 ELSIF (TG_OP = 'DELETE') THEN
   rec := OLD;
-  cmp := NEW;
 ELSIF (TG_OP = 'UPDATE') THEN
   rec := NEW;
-  cmp := OLD;
 END IF;
-msg := json_build_object(
+PERFORM pg_notify('jsonrpc', json_build_object(
   'source', TG_TABLE_NAME,
   'method', lower(TG_OP),
   'db', current_database(),
   'primary', TRUE,
-  'result', row_to_json(rec))::text;
-tst := json_build_object(
-  'source', TG_TABLE_NAME,
-  'method', lower(TG_OP),
-  'db', current_database(),
-  'primary', TRUE,
-  'result', row_to_json(cmp))::text;
-IF (tst = msg) THEN
-  RETURN NULL;
-END IF;
-PERFORM pg_notify('jsonrpc', msg);
+  'result', row_to_json(rec))::text);
 RETURN NULL;
 END;
 $$;

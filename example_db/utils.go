@@ -101,24 +101,22 @@ func ConnectNotifyWithArca(
 			}
 			request.Params = notification.Result
 
+			log.Println("notification ::", dbName, notification)
 			if notification.Primary {
-				log.Println("request:: ", request, dbName, notification.Db)
+				log.Println("request ::", dbName, notification.Db, request)
 				for dbNameContext := range *dbs {
 					if dbNameContext != notification.Db {
 						request.Context.(map[string]interface{})["Db"] = dbNameContext
-						log.Println(dbNameContext, notification.Db, ":: database", request)
+						log.Println("database ::", dbNameContext, notification.Db, request)
 						s.ProcessRequest(&request)
 					}
 				}
-				if dbName == dbNamePrimary {
-					s.Broadcast(&response)
-					log.Println("notification:: ", notification, dbName)
+				if dbName != dbNamePrimary {
+					return
 				}
-			} else {
-				s.Broadcast(&response)
-				log.Println("notification:: ", notification, dbName)
 			}
-
+			s.Broadcast(&response)
+			log.Println("broadcast ::", dbName, notification.Db, response)
 		}
 	})()
 }

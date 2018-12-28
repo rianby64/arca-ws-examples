@@ -117,14 +117,13 @@ func BindViewSum1WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
+		log.Println("handler ::", *requestParams, *context)
 		var db *sql.DB
 		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
 		if ok {
 			db = (*dbs)[dbNameContext.(string)]
-			log.Println("update Table1 via context ::", dbNameContext.(string))
 		} else {
 			db = (*dbs)[dbName]
-			log.Println("update Table1 by default ::", dbName)
 		}
 		params := (*requestParams).(map[string]interface{})
 		setters := []string{}
@@ -160,7 +159,14 @@ func BindViewSum1WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
-		db := (*dbs)[dbName]
+		log.Println("handler ::", *requestParams, *context)
+		var db *sql.DB
+		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
+		if ok {
+			db = (*dbs)[dbNameContext.(string)]
+		} else {
+			db = (*dbs)[dbName]
+		}
 		params := (*requestParams).(map[string]interface{})
 		fields := []string{}
 		values := []string{}
@@ -168,7 +174,7 @@ func BindViewSum1WithPg(
 			if key == "ID" ||
 				key == "Table1ID" ||
 				key == "Table2ID" ||
-				key == "Sum13" {
+				key == "Sum13" || key == "CreatedAt" {
 				continue
 			}
 			fields = append(fields, fmt.Sprintf(`"%v"`, key))
@@ -195,7 +201,14 @@ func BindViewSum1WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
-		db := (*dbs)[dbName]
+		log.Println("handler ::", *requestParams, *context)
+		var db *sql.DB
+		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
+		if ok {
+			db = (*dbs)[dbNameContext.(string)]
+		} else {
+			db = (*dbs)[dbName]
+		}
 		params := (*requestParams).(map[string]interface{})
 		ID := params["ID"].(string)
 
