@@ -114,12 +114,10 @@ func ConnectNotifyWithArca(
 			if notification.View {
 				log.Println("request ::", dbName, notification.Db, request)
 				log.Println("processing a change from a view")
-				for dbNameContext := range *dbs {
-					request.Context.(map[string]interface{})["Db"] = dbNameContext
-					log.Println("database ::", dbNameContext, notification.Db, request)
-					s.ProcessRequest(&request)
-				}
-				return
+				request.Context.(map[string]interface{})["Db"] = dbNamePrimary
+				log.Println("database ::", dbNamePrimary, notification.Db, request)
+				s.ProcessRequest(&request)
+				continue
 			}
 			s.Broadcast(&response)
 			log.Println("broadcast ::", dbName, notification.Db, response)

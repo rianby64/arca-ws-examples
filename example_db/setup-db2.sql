@@ -1,7 +1,4 @@
-
 \ir ./setup-db1.sql;
-
-DROP VIEW IF EXISTS "ViewSum1" CASCADE;
 
 CREATE OR REPLACE VIEW "ViewSum1" AS (
   SELECT
@@ -62,7 +59,7 @@ RETURN NULL;
 END;
 $$;
 
-DROP TRIGGER IF EXISTS "ViewSum1_process" ON "ViewSum1" CASCADE;
+DROP TRIGGER IF EXISTS "ViewSum1_process" ON "ViewSum1";
 CREATE TRIGGER "ViewSum1_process"
 INSTEAD OF INSERT OR UPDATE OR DELETE ON "ViewSum1"
 FOR EACH ROW
@@ -224,33 +221,33 @@ RETURN NULL;
 END;
 $$;
 
-DROP TRIGGER IF EXISTS "Table1_notify_viewsum1_before" ON "Table1" CASCADE;
+DROP TRIGGER IF EXISTS "Table1_notify_viewsum1_before" ON "Table1";
 CREATE TRIGGER "Table1_notify_viewsum1_before"
   BEFORE INSERT OR UPDATE OR DELETE
   ON "Table1"
   FOR EACH ROW
   EXECUTE PROCEDURE notify_from_table1_viewsum1_before();
 
-DROP TRIGGER IF EXISTS "Table1_notify_viewsum1_after" ON "Table1" CASCADE;
+DROP TRIGGER IF EXISTS "Table1_notify_viewsum1_after" ON "Table1";
 CREATE TRIGGER "Table1_notify_viewsum1_after"
   AFTER INSERT OR UPDATE OR DELETE
   ON "Table1"
   FOR EACH ROW
   EXECUTE PROCEDURE notify_from_table1_viewsum1_after();
 
-DROP TRIGGER IF EXISTS "Table2_notify_viewsum1_before" ON "Table2" CASCADE;
+DROP TRIGGER IF EXISTS "Table2_notify_viewsum1_before" ON "Table2";
 CREATE TRIGGER "Table2_notify_viewsum1_before"
   BEFORE INSERT OR UPDATE OR DELETE
   ON "Table2"
   FOR EACH ROW
   EXECUTE PROCEDURE notify_from_table2_viewsum1_before();
 
-DROP TRIGGER IF EXISTS "Table2_notify_viewsum1_after" ON "Table2" CASCADE;
+DROP TRIGGER IF EXISTS "Table2_notify_viewsum1_after" ON "Table2";
 CREATE TRIGGER "Table2_notify_viewsum1_after"
   AFTER INSERT OR UPDATE OR DELETE
   ON "Table2"
   FOR EACH ROW
   EXECUTE PROCEDURE notify_from_table2_viewsum1_after();
 
-DROP TRIGGER IF EXISTS "Table1_notify" ON "Table1" CASCADE;
-DROP TRIGGER IF EXISTS "Table2_notify" ON "Table2" CASCADE;
+DROP TRIGGER IF EXISTS "Table1_notify" ON "Table1";
+DROP TRIGGER IF EXISTS "Table2_notify" ON "Table2";

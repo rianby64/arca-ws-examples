@@ -116,10 +116,11 @@ func BindTable1WithPg(
 			SET %v
 			WHERE "ID"='%v';
 		`, strSetters, ID)
-		_, err := db.Exec(query)
+		result, err := db.Exec(query)
 		if err != nil {
 			log.Println(err)
 		}
+		log.Println("finished handler updateHandler ::", result, *requestParams, *context)
 		return nil, nil
 	}
 

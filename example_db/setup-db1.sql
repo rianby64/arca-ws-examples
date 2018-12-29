@@ -1,6 +1,5 @@
 \set QUIET 1
 
-DROP FUNCTION IF EXISTS notify_jsonrpc CASCADE;
 CREATE OR REPLACE FUNCTION notify_jsonrpc()
     RETURNS TRIGGER
     LANGUAGE 'plpgsql'
@@ -39,7 +38,7 @@ TRUNCATE "Table1";
 INSERT INTO "Table1"("Num1", "Num2")
   VALUES (1.0, 2.0), (3.0, 4.0);
 
-DROP TRIGGER IF EXISTS "Table1_notify" ON "Table1" CASCADE;
+DROP TRIGGER IF EXISTS "Table1_notify" ON "Table1";
 CREATE TRIGGER "Table1_notify"
   AFTER INSERT OR UPDATE OR DELETE
   ON "Table1"
@@ -60,9 +59,20 @@ TRUNCATE "Table2";
 INSERT INTO "Table2"("Num3", "Num4")
   VALUES (5.0, 6.0), (7.0, 8.0);
 
-DROP TRIGGER IF EXISTS "Table2_notify" ON "Table2" CASCADE;
+DROP TRIGGER IF EXISTS "Table2_notify" ON "Table2";
 CREATE TRIGGER "Table2_notify"
   AFTER INSERT OR UPDATE OR DELETE
   ON "Table2"
   FOR EACH ROW
   EXECUTE PROCEDURE notify_jsonrpc();
+
+/*
+
+DO
+$$
+BEGIN
+  PERFORM pg_notify('jsonrpc', '{"db":"arca-1","result":"whatever you want 0"}');
+END;
+$$;
+
+*/
