@@ -29,7 +29,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table1' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS primary,
+        TRUE AS view,
         current_database() AS db
       FROM (
         SELECT
@@ -46,7 +46,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table2' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS primary,
+        TRUE AS view,
         current_database() AS db
       FROM (
         SELECT
@@ -252,6 +252,3 @@ CREATE TRIGGER "Table2_notify_viewsum2_after"
   ON "Table2"
   FOR EACH ROW
   EXECUTE PROCEDURE notify_from_table2_viewsum2_after();
-
-DROP TRIGGER IF EXISTS "Table1_notify" ON "Table1" CASCADE;
-DROP TRIGGER IF EXISTS "Table2_notify" ON "Table2" CASCADE;

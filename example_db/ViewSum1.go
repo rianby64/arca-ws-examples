@@ -117,7 +117,7 @@ func BindViewSum1WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
-		log.Println("handler ::", *requestParams, *context)
+		log.Println("handler updateHandler ::", *requestParams, *context)
 		var db *sql.DB
 		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
 		if ok {
@@ -159,7 +159,7 @@ func BindViewSum1WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
-		log.Println("handler ::", *requestParams, *context)
+		log.Println("handler insertHandler ::", *requestParams, *context)
 		var db *sql.DB
 		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
 		if ok {
@@ -201,7 +201,7 @@ func BindViewSum1WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
-		log.Println("handler ::", *requestParams, *context)
+		log.Println("handler deleteHandler ::", *requestParams, *context)
 		var db *sql.DB
 		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
 		if ok {

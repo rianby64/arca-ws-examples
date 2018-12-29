@@ -17,7 +17,6 @@ CREATE OR REPLACE VIEW "ViewSum1" AS (
 CREATE OR REPLACE FUNCTION process_viewsum1()
   RETURNS trigger
   LANGUAGE 'plpgsql'
-  VOLATILE
 AS $$
 DECLARE
   r RECORD;
@@ -29,7 +28,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table1' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS primary,
+        TRUE AS view,
         current_database() AS db
       FROM (
         SELECT
@@ -46,7 +45,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table2' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS primary,
+        TRUE AS view,
         current_database() AS db
       FROM (
         SELECT

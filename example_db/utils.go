@@ -46,6 +46,7 @@ func ConnectNotifyWithArca(
 		Source  string
 		Db      string
 		Primary bool
+		View    bool
 		Result  interface{}
 	}
 
@@ -81,6 +82,7 @@ func ConnectNotifyWithArca(
 				"Source":  notification.Source,
 				"Db":      notification.Db,
 				"Primary": notification.Primary,
+				"View":    notification.View,
 			}
 			var response arca.JSONRPCresponse
 
@@ -97,15 +99,8 @@ func ConnectNotifyWithArca(
 			request.Params = notification.Result
 
 			log.Println("notification ::", dbName, notification)
-			if notification.Primary {
+			if notification.Primary && notification.Db == dbNamePrimary {
 				log.Println("request ::", dbName, notification.Db, request)
-				if notification.Db != dbNamePrimary {
-					log.Println("processing a change from a view")
-					request.Context.(map[string]interface{})["Db"] = dbNamePrimary
-					log.Println("database ::", notification.Db, request)
-					s.ProcessRequest(&request)
-					return
-				}
 				log.Println("processing a change from a primary table")
 				for dbNameContext := range *dbs {
 					if dbNameContext != dbNamePrimary {
@@ -114,6 +109,17 @@ func ConnectNotifyWithArca(
 						s.ProcessRequest(&request)
 					}
 				}
+			}
+
+			if notification.View {
+				log.Println("request ::", dbName, notification.Db, request)
+				log.Println("processing a change from a view")
+				for dbNameContext := range *dbs {
+					request.Context.(map[string]interface{})["Db"] = dbNameContext
+					log.Println("database ::", dbNameContext, notification.Db, request)
+					s.ProcessRequest(&request)
+				}
+				return
 			}
 			s.Broadcast(&response)
 			log.Println("broadcast ::", dbName, notification.Db, response)
