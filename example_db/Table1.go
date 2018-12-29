@@ -167,7 +167,7 @@ func BindTable1WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
-		//log.Println("handler deleteHandler ::", *requestParams, *context)
+		log.Println("handler deleteHandler ::", *requestParams, *context)
 		var db *sql.DB
 		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
 		if ok {
