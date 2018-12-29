@@ -90,7 +90,6 @@ func BindTable2WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
-		log.Println("handler updateHandler ::", *requestParams, *context)
 		var db *sql.DB
 		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
 		if ok {
@@ -116,11 +115,10 @@ func BindTable2WithPg(
 			SET %v
 			WHERE "ID"='%v';
 		`, strSetters, ID)
-		result, err := db.Exec(query)
+		_, err := db.Exec(query)
 		if err != nil {
 			log.Println(err)
 		}
-		log.Println("finished handler updateHandler ::", result, *requestParams, *context)
 		return nil, nil
 	}
 
@@ -129,7 +127,6 @@ func BindTable2WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
-		log.Println("handler insertHandler ::", *requestParams, *context)
 		var db *sql.DB
 		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
 		if ok {
@@ -168,7 +165,6 @@ func BindTable2WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
-		log.Println("handler deleteHandler ::", *requestParams, *context)
 		var db *sql.DB
 		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
 		if ok {

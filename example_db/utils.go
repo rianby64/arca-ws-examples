@@ -68,6 +68,7 @@ func ConnectNotifyWithArca(
 		for {
 			msg, ok := <-listener.Notify
 			if !ok {
+				log.Println("Disconnected", dbName)
 				return
 			}
 			var notification pgNotifyJSONRPC
@@ -75,7 +76,7 @@ func ConnectNotifyWithArca(
 
 			err := json.Unmarshal(payload, &notification)
 			if err != nil {
-				log.Println(err, ":: Notification ERROR")
+				log.Fatalln(payload, "Cant unmarshal it")
 			}
 
 			var context interface{} = map[string]interface{}{
@@ -98,29 +99,22 @@ func ConnectNotifyWithArca(
 			}
 			request.Params = notification.Result
 
-			log.Println("notification ::", dbName, notification)
 			if notification.Primary && notification.Db == dbNamePrimary {
-				log.Println("request ::", dbName, notification.Db, request)
-				log.Println("processing a change from a primary table")
 				for dbNameContext := range *dbs {
 					if dbNameContext != dbNamePrimary {
 						request.Context.(map[string]interface{})["Db"] = dbNameContext
-						log.Println("database ::", dbNameContext, notification.Db, request)
 						s.ProcessRequest(&request)
 					}
 				}
 			}
 
 			if notification.View {
-				log.Println("request ::", dbName, notification.Db, request)
-				log.Println("processing a change from a view")
 				request.Context.(map[string]interface{})["Db"] = dbNamePrimary
-				log.Println("database ::", dbNamePrimary, notification.Db, request)
 				s.ProcessRequest(&request)
 				continue
 			}
 			s.Broadcast(&response)
-			log.Println("broadcast ::", dbName, notification.Db, response)
+
 		}
 	})()
 }
