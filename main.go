@@ -47,10 +47,22 @@ func main() {
 	dbs[dbName3] = db3
 	example.ConnectNotifyWithArca(connStr3, dbName3, dbName1, &ws, &dbs)
 
+	dbName4 := "arca-4"
+	connStr4 := fmt.Sprintf(
+		"user=arca password=arca dbname=%v sslmode=disable",
+		dbName4)
+	db4, err := sql.Open("postgres", connStr4)
+	if err != nil {
+		log.Fatal(err)
+	}
+	dbs[dbName4] = db4
+	example.ConnectNotifyWithArca(connStr4, dbName4, dbName1, &ws, &dbs)
+
 	example.BindTable1WithPg(&ws, connStr1, dbName1, &dbs)
 	example.BindTable2WithPg(&ws, connStr1, dbName1, &dbs)
 	example.BindViewSum1WithPg(&ws, connStr2, dbName2, &dbs)
 	example.BindViewSum2WithPg(&ws, connStr3, dbName3, &dbs)
+	example.BindViewSum3WithPg(&ws, connStr4, dbName4, &dbs)
 
 	http.HandleFunc("/ws", ws.Handle)
 	http.Handle("/", http.FileServer(http.Dir("./static")))

@@ -67,12 +67,11 @@ CREATE TRIGGER "Table2_notify"
   EXECUTE PROCEDURE notify_jsonrpc();
 
 /*
-
-DO
-$$
-BEGIN
-  PERFORM pg_notify('jsonrpc', '{"db":"arca-1","result":"whatever you want 0"}');
-END;
-$$;
-
+UPDATE "ViewSum3"
+  SET
+    "Table1Num1"=CEIL(RANDOM() * 1000) / 10,
+    "Table1Num2"=CEIL(RANDOM() * 1000) / 10,
+    "Table2Num3"=CEIL(RANDOM() * 1000) / 10,
+    "Table2Num4"=CEIL(RANDOM() * 1000) / 10
+  WHERE "ID"='3:3';
 */

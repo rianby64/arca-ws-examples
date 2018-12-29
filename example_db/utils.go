@@ -99,6 +99,7 @@ func ConnectNotifyWithArca(
 			}
 			request.Params = notification.Result
 
+			log.Println("notification ::", notification)
 			if notification.Primary && notification.Db == dbNamePrimary {
 				for dbNameContext := range *dbs {
 					if dbNameContext != dbNamePrimary {
