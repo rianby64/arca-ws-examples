@@ -13,8 +13,6 @@ import (
 // BindTable2WithPg whatever
 func BindTable2WithPg(
 	s *arca.JSONRPCExtensionWS,
-	connStr string,
-	dbName string,
 	dbs *map[string]*sql.DB,
 ) *grid.Grid {
 
@@ -27,73 +25,6 @@ func BindTable2WithPg(
 
 	g := grid.Grid{}
 
-	var queryHandler grid.RequestHandler = func(
-		requestParams *interface{},
-		context *interface{},
-		notify grid.NotifyCallback,
-	) (interface{}, error) {
-		db := (*dbs)[dbName]
-		rows, err := db.Query(`
-		SELECT
-			"ID",
-			"I",
-			"Num3",
-			"Num4"
-		FROM "Table2"
-		ORDER BY "ID"
-		`)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		var results []Table2
-
-		var iID interface{}
-		var iI interface{}
-		var iNum3 interface{}
-		var iNum4 interface{}
-
-		for rows.Next() {
-			err := rows.Scan(
-				&iID,
-				&iI,
-				&iNum3,
-				&iNum4,
-			)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			var ID int64
-			var I int64
-			var Num3 float64
-			var Num4 float64
-
-			if iID != nil {
-				ID = iID.(int64)
-			}
-			if iI != nil {
-				I = iI.(int64)
-			}
-			if iNum3 != nil {
-				Num3 = iNum3.(float64)
-			}
-			if iNum4 != nil {
-				Num4 = iNum4.(float64)
-			}
-
-			results = append(results, Table2{
-				ID:   ID,
-				I:    I,
-				Num3: Num3,
-				Num4: Num4,
-			})
-		}
-
-		rows.Close()
-		return results, nil
-	}
-
 	var updateHandler grid.RequestHandler = func(
 		requestParams *interface{},
 		context *interface{},
@@ -104,7 +35,7 @@ func BindTable2WithPg(
 		if ok {
 			db = (*dbs)[dbNameContext.(string)]
 		} else {
-			db = (*dbs)[dbName]
+			log.Fatal("Update handler triggered without dbName context")
 		}
 		params := (*requestParams).(map[string]interface{})
 		setters := []string{}
@@ -145,7 +76,7 @@ func BindTable2WithPg(
 		if ok {
 			db = (*dbs)[dbNameContext.(string)]
 		} else {
-			db = (*dbs)[dbName]
+			log.Fatal("Insert handler triggered without dbName context")
 		}
 		params := (*requestParams).(map[string]interface{})
 		fields := []string{}
@@ -187,7 +118,7 @@ func BindTable2WithPg(
 		if ok {
 			db = (*dbs)[dbNameContext.(string)]
 		} else {
-			db = (*dbs)[dbName]
+			log.Fatal("Delete handler triggered without dbName context")
 		}
 		params := (*requestParams).(map[string]interface{})
 		ID := params["ID"].(float64)
@@ -204,12 +135,12 @@ func BindTable2WithPg(
 	}
 
 	methods := grid.QUID{
-		Query:  &queryHandler,
+		Query:  nil,
 		Update: &updateHandler,
 		Insert: &insertHandler,
 		Delete: &deleteHandler,
 	}
 
-	BindArcaWithGrid(connStr, s, &g, &methods, "Table2")
+	BindArcaWithGrid(s, &g, &methods, "Table2")
 	return &g
 }

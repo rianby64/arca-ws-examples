@@ -1,4 +1,4 @@
-\ir ./setup-db1.sql;
+\ir ./setup-db-primary.sql;
 
 CREATE OR REPLACE VIEW "ViewSum1" AS (
   SELECT

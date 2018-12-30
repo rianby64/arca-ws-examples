@@ -13,9 +13,7 @@ import (
 // BindViewSum3WithPg whatever
 func BindViewSum3WithPg(
 	s *arca.JSONRPCExtensionWS,
-	connStr string,
-	dbName string,
-	dbs *map[string]*sql.DB,
+	db *sql.DB,
 ) *grid.Grid {
 
 	type ViewSum3 struct {
@@ -38,7 +36,6 @@ func BindViewSum3WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
-		db := (*dbs)[dbName]
 		rows, err := db.Query(`
 		SELECT
 			"ID",
@@ -153,13 +150,6 @@ func BindViewSum3WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
-		var db *sql.DB
-		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
-		if ok {
-			db = (*dbs)[dbNameContext.(string)]
-		} else {
-			db = (*dbs)[dbName]
-		}
 		params := (*requestParams).(map[string]interface{})
 		setters := []string{}
 		for key, value := range params {
@@ -201,13 +191,6 @@ func BindViewSum3WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
-		var db *sql.DB
-		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
-		if ok {
-			db = (*dbs)[dbNameContext.(string)]
-		} else {
-			db = (*dbs)[dbName]
-		}
 		params := (*requestParams).(map[string]interface{})
 		fields := []string{}
 		values := []string{}
@@ -250,13 +233,6 @@ func BindViewSum3WithPg(
 		context *interface{},
 		notify grid.NotifyCallback,
 	) (interface{}, error) {
-		var db *sql.DB
-		dbNameContext, ok := (*context).(map[string]interface{})["Db"]
-		if ok {
-			db = (*dbs)[dbNameContext.(string)]
-		} else {
-			db = (*dbs)[dbName]
-		}
 		params := (*requestParams).(map[string]interface{})
 		ID := params["ID"].(string)
 
@@ -278,6 +254,6 @@ func BindViewSum3WithPg(
 		Delete: &deleteHandler,
 	}
 
-	BindArcaWithGrid(connStr, s, &g, &methods, "ViewSum3")
+	BindArcaWithGrid(s, &g, &methods, "ViewSum3")
 	return &g
 }

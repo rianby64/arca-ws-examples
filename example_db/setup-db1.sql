@@ -1,69 +1,345 @@
-\set QUIET 1
+\ir ./setup-db-primary.sql;
 
-CREATE OR REPLACE FUNCTION notify_jsonrpc()
-    RETURNS TRIGGER
-    LANGUAGE 'plpgsql'
-    IMMUTABLE
+CREATE OR REPLACE VIEW "ViewTable1" AS (
+  SELECT
+    "Table1"."ID" AS "ID",
+    "Table1"."I" AS "I",
+    "Table1"."Num1" AS "Num1",
+    "Table1"."Num2" AS "Num2"
+  FROM "Table1"
+);
+
+CREATE OR REPLACE FUNCTION process_viewtable1()
+  RETURNS trigger
+  LANGUAGE 'plpgsql'
 AS $$
 DECLARE
-  rec RECORD;
+  r RECORD;
 BEGIN
-IF (TG_OP = 'INSERT') THEN
-  rec := NEW;
-ELSIF (TG_OP = 'DELETE') THEN
-  rec := OLD;
-ELSIF (TG_OP = 'UPDATE') THEN
-  rec := NEW;
+IF TG_OP = 'UPDATE' THEN
+  IF (NEW."I" <> OLD."I") THEN
+    FOR r IN (
+      SELECT
+        'Table1' AS source,
+        lower(TG_OP) AS method,
+        row_to_json(t) AS result,
+        TRUE AS view,
+        current_database() AS db
+      FROM (
+        SELECT
+          NEW."ID" AS "ID",
+          NEW."I" AS "I"
+      ) t
+    ) LOOP
+      PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+    END LOOP;
+  END IF;
+  IF (NEW."Num1" <> OLD."Num1") THEN
+    FOR r IN (
+      SELECT
+        'Table1' AS source,
+        lower(TG_OP) AS method,
+        row_to_json(t) AS result,
+        TRUE AS view,
+        current_database() AS db
+      FROM (
+        SELECT
+          NEW."ID" AS "ID",
+          NEW."Num1" AS "Num1"
+      ) t
+    ) LOOP
+      PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+    END LOOP;
+  END IF;
+  IF (NEW."Num2" <> OLD."Num2") THEN
+    FOR r IN (
+      SELECT
+        'Table1' AS source,
+        lower(TG_OP) AS method,
+        row_to_json(t) AS result,
+        TRUE AS view,
+        current_database() AS db
+      FROM (
+        SELECT
+          NEW."ID" AS "ID",
+          NEW."Num2" AS "Num2"
+      ) t
+    ) LOOP
+      PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+    END LOOP;
+  END IF;
+  RETURN NEW;
 END IF;
-PERFORM pg_notify('jsonrpc', json_build_object(
-  'source', TG_TABLE_NAME,
-  'method', lower(TG_OP),
-  'db', current_database(),
-  'primary', TRUE,
-  'result', row_to_json(rec))::text);
 RETURN NULL;
 END;
 $$;
 
-CREATE TABLE IF NOT EXISTS "Table1"
-(
-  "ID" SERIAL,
-  "I" bigint DEFAULT 0,
-  "Num1" double precision DEFAULT 0.0,
-  "Num2" double precision DEFAULT 0.0,
-  "CreatedAt" timestamp with time zone DEFAULT now(),
-  CONSTRAINT "Table1_pkey" PRIMARY KEY ("ID")
-);
+CREATE OR REPLACE FUNCTION notify_from_table1_viewtable1_before()
+  RETURNS TRIGGER
+  LANGUAGE plpgsql
+AS $$
+DECLARE
+  r RECORD;
+BEGIN
+IF (TG_OP = 'DELETE') THEN
+  FOR r IN (
+    SELECT
+      'ViewTable1' AS source,
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      current_database() AS db
+    FROM (
+      SELECT *
+        FROM "ViewTable1"
+        WHERE "ID"=OLD."ID"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
+  RETURN OLD;
+ELSIF (TG_OP = 'UPDATE') THEN
+  RETURN NEW;
+ELSIF (TG_OP = 'INSERT') THEN
+  RETURN NEW;
+END IF;
+RETURN NULL;
+END;
+$$;
 
-TRUNCATE "Table1";
-INSERT INTO "Table1"("Num1", "Num2")
-  VALUES (1.0, 2.0), (3.0, 4.0);
+CREATE OR REPLACE FUNCTION notify_from_table1_viewtable1_after()
+  RETURNS TRIGGER
+  LANGUAGE plpgsql
+AS $$
+DECLARE
+  r RECORD;
+BEGIN
+IF (TG_OP = 'DELETE') THEN
+  RETURN OLD;
+ELSIF (TG_OP = 'UPDATE') THEN
+  FOR r IN (
+    SELECT
+      'ViewTable1' AS source,
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      current_database() AS db
+    FROM (
+      SELECT *
+        FROM "ViewTable1"
+        WHERE "ID"=NEW."ID"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
+  RETURN NEW;
+ELSIF (TG_OP = 'INSERT') THEN
+  FOR r IN (
+    SELECT
+      'ViewTable1' AS source,
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      current_database() AS db
+    FROM (
+      SELECT *
+        FROM "ViewTable1"
+        WHERE "ID"=NEW."ID"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
+  RETURN NEW;
+END IF;
+RETURN NULL;
+END;
+$$;
 
-DROP TRIGGER IF EXISTS "Table1_notify" ON "Table1";
-CREATE TRIGGER "Table1_notify"
+DROP TRIGGER IF EXISTS "ViewTable1_process" ON "ViewTable1";
+CREATE TRIGGER "ViewTable1_process"
+INSTEAD OF INSERT OR UPDATE OR DELETE ON "ViewTable1"
+FOR EACH ROW
+EXECUTE PROCEDURE process_viewtable1();
+
+DROP TRIGGER IF EXISTS "Table1_notify_viewTable1_before" ON "Table1";
+CREATE TRIGGER "Table1_notify_viewTable1_before"
+  BEFORE INSERT OR UPDATE OR DELETE
+  ON "Table1"
+  FOR EACH ROW
+  EXECUTE PROCEDURE notify_from_table1_viewtable1_before();
+
+DROP TRIGGER IF EXISTS "Table1_notify_viewTable1_after" ON "Table1";
+CREATE TRIGGER "Table1_notify_viewTable1_after"
   AFTER INSERT OR UPDATE OR DELETE
   ON "Table1"
   FOR EACH ROW
-  EXECUTE PROCEDURE notify_jsonrpc();
+  EXECUTE PROCEDURE notify_from_table1_viewtable1_after();
 
-
-CREATE TABLE IF NOT EXISTS "Table2"
-(
-  "ID" SERIAL,
-  "I" bigint DEFAULT 0,
-  "Num3" double precision DEFAULT 0.0,
-  "Num4" double precision DEFAULT 0.0,
-  "CreatedAt" timestamp with time zone DEFAULT now(),
-  CONSTRAINT "Table2_pkey" PRIMARY KEY ("ID")
+CREATE OR REPLACE VIEW "ViewTable2" AS (
+  SELECT
+    "Table2"."ID" AS "ID",
+    "Table2"."I" AS "I",
+    "Table2"."Num3" AS "Num3",
+    "Table2"."Num4" AS "Num4"
+  FROM "Table2"
 );
 
-TRUNCATE "Table2";
-INSERT INTO "Table2"("Num3", "Num4")
-  VALUES (5.0, 6.0), (7.0, 8.0);
+CREATE OR REPLACE FUNCTION process_viewtable2()
+  RETURNS trigger
+  LANGUAGE 'plpgsql'
+AS $$
+DECLARE
+  r RECORD;
+BEGIN
+IF TG_OP = 'UPDATE' THEN
+  IF (NEW."I" <> OLD."I") THEN
+    FOR r IN (
+      SELECT
+        'Table2' AS source,
+        lower(TG_OP) AS method,
+        row_to_json(t) AS result,
+        TRUE AS view,
+        current_database() AS db
+      FROM (
+        SELECT
+          NEW."ID" AS "ID",
+          NEW."I" AS "I"
+      ) t
+    ) LOOP
+      PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+    END LOOP;
+  END IF;
+  IF (NEW."Num3" <> OLD."Num3") THEN
+    FOR r IN (
+      SELECT
+        'Table2' AS source,
+        lower(TG_OP) AS method,
+        row_to_json(t) AS result,
+        TRUE AS view,
+        current_database() AS db
+      FROM (
+        SELECT
+          NEW."ID" AS "ID",
+          NEW."Num3" AS "Num3"
+      ) t
+    ) LOOP
+      PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+    END LOOP;
+  END IF;
+  IF (NEW."Num4" <> OLD."Num4") THEN
+    FOR r IN (
+      SELECT
+        'Table2' AS source,
+        lower(TG_OP) AS method,
+        row_to_json(t) AS result,
+        TRUE AS view,
+        current_database() AS db
+      FROM (
+        SELECT
+          NEW."ID" AS "ID",
+          NEW."Num4" AS "Num4"
+      ) t
+    ) LOOP
+      PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+    END LOOP;
+  END IF;
+  RETURN NEW;
+END IF;
+RETURN NULL;
+END;
+$$;
 
-DROP TRIGGER IF EXISTS "Table2_notify" ON "Table2";
-CREATE TRIGGER "Table2_notify"
+CREATE OR REPLACE FUNCTION notify_from_table2_viewtable2_before()
+  RETURNS TRIGGER
+  LANGUAGE plpgsql
+AS $$
+DECLARE
+  r RECORD;
+BEGIN
+IF (TG_OP = 'DELETE') THEN
+  FOR r IN (
+    SELECT
+      'ViewTable2' AS source,
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      current_database() AS db
+    FROM (
+      SELECT *
+        FROM "ViewTable2"
+        WHERE "ID"=OLD."ID"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
+  RETURN OLD;
+ELSIF (TG_OP = 'UPDATE') THEN
+  RETURN NEW;
+ELSIF (TG_OP = 'INSERT') THEN
+  RETURN NEW;
+END IF;
+RETURN NULL;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION notify_from_table2_viewtable2_after()
+  RETURNS TRIGGER
+  LANGUAGE plpgsql
+AS $$
+DECLARE
+  r RECORD;
+BEGIN
+IF (TG_OP = 'DELETE') THEN
+  RETURN OLD;
+ELSIF (TG_OP = 'UPDATE') THEN
+  FOR r IN (
+    SELECT
+      'ViewTable2' AS source,
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      current_database() AS db
+    FROM (
+      SELECT *
+        FROM "ViewTable2"
+        WHERE "ID"=NEW."ID"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
+  RETURN NEW;
+ELSIF (TG_OP = 'INSERT') THEN
+  FOR r IN (
+    SELECT
+      'ViewTable2' AS source,
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      current_database() AS db
+    FROM (
+      SELECT *
+        FROM "ViewTable2"
+        WHERE "ID"=NEW."ID"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
+  RETURN NEW;
+END IF;
+RETURN NULL;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS "ViewTable2_process" ON "ViewTable2";
+CREATE TRIGGER "ViewTable2_process"
+INSTEAD OF INSERT OR UPDATE OR DELETE ON "ViewTable2"
+FOR EACH ROW
+EXECUTE PROCEDURE process_viewtable2();
+
+DROP TRIGGER IF EXISTS "Table2_notify_viewTable2_before" ON "Table2";
+CREATE TRIGGER "Table2_notify_viewTable2_before"
+  BEFORE INSERT OR UPDATE OR DELETE
+  ON "Table2"
+  FOR EACH ROW
+  EXECUTE PROCEDURE notify_from_table2_viewtable2_before();
+
+DROP TRIGGER IF EXISTS "Table2_notify_viewTable2_after" ON "Table2";
+CREATE TRIGGER "Table2_notify_viewTable2_after"
   AFTER INSERT OR UPDATE OR DELETE
   ON "Table2"
   FOR EACH ROW
-  EXECUTE PROCEDURE notify_jsonrpc();
+  EXECUTE PROCEDURE notify_from_table2_viewtable2_after();
