@@ -22,6 +22,8 @@ func BindViewSum3WithPg(
 		ID         string
 		Table1ID   int64
 		Table2ID   int64
+		Table1I    int64
+		Table2I    int64
 		Table1Num1 float64
 		Table1Num2 float64
 		Table2Num3 float64
@@ -42,6 +44,8 @@ func BindViewSum3WithPg(
 			"ID",
 			"Table1ID",
 			"Table2ID",
+			"Table1I",
+			"Table2I",
 			"Table1Num1",
 			"Table1Num2",
 			"Table2Num3",
@@ -59,6 +63,8 @@ func BindViewSum3WithPg(
 		var iID interface{}
 		var iTable1ID interface{}
 		var iTable2ID interface{}
+		var iTable1I interface{}
+		var iTable2I interface{}
 		var iTable1Num1 interface{}
 		var iTable1Num2 interface{}
 		var iTable2Num3 interface{}
@@ -70,6 +76,8 @@ func BindViewSum3WithPg(
 				&iID,
 				&iTable1ID,
 				&iTable2ID,
+				&iTable1I,
+				&iTable2I,
 				&iTable1Num1,
 				&iTable1Num2,
 				&iTable2Num3,
@@ -83,6 +91,8 @@ func BindViewSum3WithPg(
 			var ID string
 			var Table1ID int64
 			var Table2ID int64
+			var Table1I int64
+			var Table2I int64
 			var Table1Num1 float64
 			var Table1Num2 float64
 			var Table2Num3 float64
@@ -97,6 +107,12 @@ func BindViewSum3WithPg(
 			}
 			if iTable2ID != nil {
 				Table2ID = iTable2ID.(int64)
+			}
+			if iTable1I != nil {
+				Table1I = iTable1I.(int64)
+			}
+			if iTable2I != nil {
+				Table2I = iTable2I.(int64)
 			}
 			if iTable1Num1 != nil {
 				Table1Num1 = iTable1Num1.(float64)
@@ -118,6 +134,8 @@ func BindViewSum3WithPg(
 				ID:         ID,
 				Table1ID:   Table1ID,
 				Table2ID:   Table2ID,
+				Table1I:    Table1I,
+				Table2I:    Table2I,
 				Table1Num1: Table1Num1,
 				Table1Num2: Table1Num2,
 				Table2Num3: Table2Num3,
@@ -158,6 +176,11 @@ func BindViewSum3WithPg(
 				Value := value.(float64)
 				setters = append(setters, fmt.Sprintf(`"%v"=%v`, key, Value))
 			}
+			if key == "Table1I" ||
+				key == "Table2I" {
+				Value := int64(value.(float64))
+				setters = append(setters, fmt.Sprintf(`"%v"=%v`, key, Value))
+			}
 		}
 		strSetters := strings.Join(setters, ",")
 		ID := params["ID"].(string)
@@ -192,7 +215,7 @@ func BindViewSum3WithPg(
 			if key == "ID" ||
 				key == "Table1ID" ||
 				key == "Table2ID" ||
-				key == "Sum1234" {
+				key == "Sum1234" || key == "CreatedAt" {
 				continue
 			}
 			fields = append(fields, fmt.Sprintf(`"%v"`, key))
@@ -201,6 +224,11 @@ func BindViewSum3WithPg(
 				key == "Table2Num3" ||
 				key == "Table2Num4" {
 				Value := value.(float64)
+				values = append(values, fmt.Sprintf(`%v`, Value))
+			}
+			if key == "Table1I" ||
+				key == "Table2I" {
+				Value := int64(value.(float64))
 				values = append(values, fmt.Sprintf(`%v`, Value))
 			}
 		}

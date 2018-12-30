@@ -22,6 +22,8 @@ func BindViewSum2WithPg(
 		ID         string
 		Table1ID   int64
 		Table2ID   int64
+		Table1I    int64
+		Table2I    int64
 		Table1Num2 float64
 		Table2Num4 float64
 		Sum24      float64
@@ -40,6 +42,8 @@ func BindViewSum2WithPg(
 			"ID",
 			"Table1ID",
 			"Table2ID",
+			"Table1I",
+			"Table2I",
 			"Table1Num2",
 			"Table2Num4",
 			"Sum24"
@@ -55,6 +59,8 @@ func BindViewSum2WithPg(
 		var iID interface{}
 		var iTable1ID interface{}
 		var iTable2ID interface{}
+		var iTable1I interface{}
+		var iTable2I interface{}
 		var iTable1Num2 interface{}
 		var iTable2Num4 interface{}
 		var iSum24 interface{}
@@ -64,6 +70,8 @@ func BindViewSum2WithPg(
 				&iID,
 				&iTable1ID,
 				&iTable2ID,
+				&iTable1I,
+				&iTable2I,
 				&iTable1Num2,
 				&iTable2Num4,
 				&iSum24,
@@ -75,6 +83,8 @@ func BindViewSum2WithPg(
 			var ID string
 			var Table1ID int64
 			var Table2ID int64
+			var Table1I int64
+			var Table2I int64
 			var Table1Num2 float64
 			var Table2Num4 float64
 			var Sum24 float64
@@ -87,6 +97,12 @@ func BindViewSum2WithPg(
 			}
 			if iTable2ID != nil {
 				Table2ID = iTable2ID.(int64)
+			}
+			if iTable1I != nil {
+				Table1I = iTable1I.(int64)
+			}
+			if iTable2I != nil {
+				Table2I = iTable2I.(int64)
 			}
 			if iTable1Num2 != nil {
 				Table1Num2 = iTable1Num2.(float64)
@@ -102,6 +118,8 @@ func BindViewSum2WithPg(
 				ID:         ID,
 				Table1ID:   Table1ID,
 				Table2ID:   Table2ID,
+				Table1I:    Table1I,
+				Table2I:    Table2I,
 				Table1Num2: Table1Num2,
 				Table2Num4: Table2Num4,
 				Sum24:      Sum24,
@@ -138,6 +156,11 @@ func BindViewSum2WithPg(
 				Value := value.(float64)
 				setters = append(setters, fmt.Sprintf(`"%v"=%v`, key, Value))
 			}
+			if key == "Table1I" ||
+				key == "Table2I" {
+				Value := int64(value.(float64))
+				setters = append(setters, fmt.Sprintf(`"%v"=%v`, key, Value))
+			}
 		}
 		strSetters := strings.Join(setters, ",")
 		ID := params["ID"].(string)
@@ -172,12 +195,16 @@ func BindViewSum2WithPg(
 			if key == "ID" ||
 				key == "Table1ID" ||
 				key == "Table2ID" ||
-				key == "Sum24" {
+				key == "Sum24" || key == "CreatedAt" {
 				continue
 			}
 			fields = append(fields, fmt.Sprintf(`"%v"`, key))
 			if key == "Table1Num2" || key == "Table2Num4" {
 				Value := value.(float64)
+				values = append(values, fmt.Sprintf(`%v`, Value))
+			}
+			if key == "Table1I" || key == "Table2I" {
+				Value := int64(value.(float64))
 				values = append(values, fmt.Sprintf(`%v`, Value))
 			}
 		}

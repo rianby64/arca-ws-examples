@@ -20,6 +20,7 @@ func BindTable2WithPg(
 
 	type Table2 struct {
 		ID   int64
+		I    int64
 		Num3 float64
 		Num4 float64
 	}
@@ -35,6 +36,7 @@ func BindTable2WithPg(
 		rows, err := db.Query(`
 		SELECT
 			"ID",
+			"I",
 			"Num3",
 			"Num4"
 		FROM "Table2"
@@ -47,12 +49,14 @@ func BindTable2WithPg(
 		var results []Table2
 
 		var iID interface{}
+		var iI interface{}
 		var iNum3 interface{}
 		var iNum4 interface{}
 
 		for rows.Next() {
 			err := rows.Scan(
 				&iID,
+				&iI,
 				&iNum3,
 				&iNum4,
 			)
@@ -61,11 +65,15 @@ func BindTable2WithPg(
 			}
 
 			var ID int64
+			var I int64
 			var Num3 float64
 			var Num4 float64
 
 			if iID != nil {
 				ID = iID.(int64)
+			}
+			if iI != nil {
+				I = iI.(int64)
 			}
 			if iNum3 != nil {
 				Num3 = iNum3.(float64)
@@ -76,6 +84,7 @@ func BindTable2WithPg(
 
 			results = append(results, Table2{
 				ID:   ID,
+				I:    I,
 				Num3: Num3,
 				Num4: Num4,
 			})
@@ -100,11 +109,15 @@ func BindTable2WithPg(
 		params := (*requestParams).(map[string]interface{})
 		setters := []string{}
 		for key, value := range params {
-			if key == "ID" {
+			if key == "ID" || key == "CreatedAt" {
 				continue
 			}
 			if key == "Num3" || key == "Num4" {
 				Value := value.(float64)
+				setters = append(setters, fmt.Sprintf(`"%v"=%v`, key, Value))
+			}
+			if key == "I" {
+				Value := int64(value.(float64))
 				setters = append(setters, fmt.Sprintf(`"%v"=%v`, key, Value))
 			}
 		}
@@ -144,6 +157,10 @@ func BindTable2WithPg(
 			fields = append(fields, fmt.Sprintf(`"%v"`, key))
 			if key == "Num3" || key == "Num4" {
 				Value := value.(float64)
+				values = append(values, fmt.Sprintf(`%v`, Value))
+			}
+			if key == "I" {
+				Value := int64(value.(float64))
 				values = append(values, fmt.Sprintf(`%v`, Value))
 			}
 		}

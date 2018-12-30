@@ -5,6 +5,8 @@ CREATE OR REPLACE VIEW "ViewSum2" AS (
     "Table1"."ID" || ':' || "Table2"."ID" AS "ID",
     "Table1"."ID" AS "Table1ID",
     "Table2"."ID" AS "Table2ID",
+    "Table1"."I" AS "Table1I",
+    "Table2"."I" AS "Table2I",
     "Table1"."Num2" AS "Table1Num2",
     "Table2"."Num4" AS "Table2Num4",
     "Table1"."Num2" + "Table2"."Num4" AS "Sum24"
@@ -19,6 +21,40 @@ DECLARE
   r RECORD;
 BEGIN
 IF TG_OP = 'UPDATE' THEN
+  IF (NEW."Table1I" <> OLD."Table1I") THEN
+    FOR r IN (
+      SELECT
+        'Table1' AS source,
+        lower(TG_OP) AS method,
+        row_to_json(t) AS result,
+        TRUE AS view,
+        current_database() AS db
+      FROM (
+        SELECT
+          NEW."Table1ID" AS "ID",
+          NEW."Table1I" AS "I"
+      ) t
+    ) LOOP
+      PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+    END LOOP;
+  END IF;
+  IF (NEW."Table2I" <> OLD."Table2I") THEN
+    FOR r IN (
+      SELECT
+        'Table1' AS source,
+        lower(TG_OP) AS method,
+        row_to_json(t) AS result,
+        TRUE AS view,
+        current_database() AS db
+      FROM (
+        SELECT
+          NEW."Table2ID" AS "ID",
+          NEW."Table2I" AS "I"
+      ) t
+    ) LOOP
+      PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+    END LOOP;
+  END IF;
   IF (NEW."Table1Num2" <> OLD."Table1Num2") THEN
     FOR r IN (
       SELECT
