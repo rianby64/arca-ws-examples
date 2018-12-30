@@ -149,7 +149,7 @@ function setupTable(tableid, rowid, Source, fields, convertFn) {
 }
 
 conn.onopen = () => {
-    setupTable('Table1', 'Table1-row', 'Table1',
+    setupTable('Table1', 'Table1-row', 'ViewTable1',
         ['ID', 'Num1', 'Num2'],
         {
             "ID": Number,
@@ -157,7 +157,7 @@ conn.onopen = () => {
             "Num2": Number,
         }
     );
-    setupTable('Table2', 'Table2-row', 'Table2',
+    setupTable('Table2', 'Table2-row', 'ViewTable2',
         ['ID', 'Num3', 'Num4'],
         {
             "ID": Number,

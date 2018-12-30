@@ -58,11 +58,15 @@ func main() {
 	dbs[dbName4] = db4
 	example.ConnectNotifyWithArca(connStr4, dbName4, dbName1, &ws, &dbs)
 
-	example.BindTable1WithPg(&ws, connStr1, dbName1, &dbs)
-	example.BindTable2WithPg(&ws, connStr1, dbName1, &dbs)
-	example.BindViewSum1WithPg(&ws, connStr2, dbName2, &dbs)
-	example.BindViewSum2WithPg(&ws, connStr3, dbName3, &dbs)
-	example.BindViewSum3WithPg(&ws, connStr4, dbName4, &dbs)
+	example.BindTable1WithPg(&ws, &dbs)
+	example.BindTable2WithPg(&ws, &dbs)
+
+	example.BindViewTable1WithPg(&ws, db1)
+	example.BindViewTable2WithPg(&ws, db1)
+
+	example.BindViewSum1WithPg(&ws, db2)
+	example.BindViewSum2WithPg(&ws, db3)
+	example.BindViewSum3WithPg(&ws, db4)
 
 	http.HandleFunc("/ws", ws.Handle)
 	http.Handle("/", http.FileServer(http.Dir("./static")))
