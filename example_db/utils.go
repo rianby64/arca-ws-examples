@@ -99,24 +99,14 @@ func ConnectNotifyWithArca(
 			request.Params = notification.Result
 
 			log.Println("notification ::", notification)
-			/*
-				if notification.Primary && notification.Db == dbNamePrimary {
-					for dbNameContext := range *dbs {
-						if dbNameContext != dbNamePrimary {
-							request.Context.(map[string]interface{})["Db"] = dbNameContext
-							s.ProcessRequest(&request)
-						}
-					}
-				}
-
-				if notification.View {
-					request.Context.(map[string]interface{})["Db"] = dbNamePrimary
+			if notification.View {
+				for dbNameContext := range *dbs {
+					request.Context.(map[string]interface{})["Db"] = dbNameContext
 					s.ProcessRequest(&request)
-					continue
 				}
-				s.Broadcast(&response)
-			*/
-
+				continue
+			}
+			s.Broadcast(&response)
 		}
 	})()
 }

@@ -111,6 +111,7 @@ function setupTable(tableid, rowid, Source, fields, convertFn) {
 
     conn.messageHandlers[Source] = (data) => {
         const result = data.Result;
+        if (data.Method === 'update') return;
         if (data.Method === 'delete') {
             let row = tbody.querySelector(`tr[id="${result.ID}"]`);
             if (row) {
@@ -150,43 +151,51 @@ function setupTable(tableid, rowid, Source, fields, convertFn) {
 
 conn.onopen = () => {
     setupTable('Table1', 'Table1-row', 'ViewTable1',
-        ['ID', 'Num1', 'Num2'],
+        ['ID', 'I', 'Num1', 'Num2'],
         {
             "ID": Number,
+            "I": Number,
             "Num1": Number,
             "Num2": Number,
         }
     );
     setupTable('Table2', 'Table2-row', 'ViewTable2',
-        ['ID', 'Num3', 'Num4'],
+        ['ID', 'I', 'Num3', 'Num4'],
         {
             "ID": Number,
+            "I": Number,
             "Num3": Number,
             "Num4": Number,
         }
     );
     setupTable('ViewSum1', 'ViewSum1-row', 'ViewSum1',
-        ['ID', 'Table1Num1', 'Table2Num3', 'Sum13'],
+        ['ID', 'Table1I', 'Table2I', 'Table1Num1', 'Table2Num3', 'Sum13'],
         {
             "ID": String,
+            "Table1I": Number,
+            "Table2I": Number,
             "Table1Num1": Number,
             "Table2Num3": Number,
             "Sum13": Number,
         }
     );
     setupTable('ViewSum2', 'ViewSum2-row', 'ViewSum2',
-        ['ID', 'Table1Num2', 'Table2Num4', 'Sum24'],
+        ['ID', 'Table1I', 'Table2I', 'Table1Num2', 'Table2Num4', 'Sum24'],
         {
             "ID": String,
+            "Table1I": Number,
+            "Table2I": Number,
             "Table1Num2": Number,
             "Table2Num4": Number,
             "Sum24": Number,
         }
     );
     setupTable('ViewSum3', 'ViewSum3-row', 'ViewSum3',
-        ['ID', 'Table1Num1', 'Table1Num2', 'Table2Num3', 'Table2Num4', 'Sum1234'],
+        ['ID', 'Table1I', 'Table2I', 'Table1Num1', 'Table1Num2', 'Table2Num3', 'Table2Num4', 'Sum1234'],
         {
             "ID": String,
+            "Table1I": Number,
+            "Table2I": Number,
             "Table1Num1": Number,
             "Table1Num2": Number,
             "Table2Num3": Number,

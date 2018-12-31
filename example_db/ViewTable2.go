@@ -18,9 +18,9 @@ func BindViewTable2WithPg(
 
 	type ViewTable2 struct {
 		ID   int64
+		I    int64
 		Num3 float64
 		Num4 float64
-		I    int64
 	}
 
 	g := grid.Grid{}
@@ -33,9 +33,9 @@ func BindViewTable2WithPg(
 		rows, err := db.Query(`
 		SELECT
 			"ID",
+			"I",
 			"Num3",
-			"Num4",
-			"I"
+			"Num4"
 		FROM "ViewTable2"
 		ORDER BY "ID"
 		`)
@@ -46,28 +46,31 @@ func BindViewTable2WithPg(
 		var results []ViewTable2
 
 		var iID interface{}
+		var iI interface{}
 		var iNum3 interface{}
 		var iNum4 interface{}
-		var iI interface{}
 
 		for rows.Next() {
 			err := rows.Scan(
 				&iID,
+				&iI,
 				&iNum3,
 				&iNum4,
-				&iI,
 			)
 			if err != nil {
 				log.Fatal(err)
 			}
 
 			var ID int64
+			var I int64
 			var Num3 float64
 			var Num4 float64
-			var I int64
 
 			if iID != nil {
 				ID = iID.(int64)
+			}
+			if iI != nil {
+				I = iI.(int64)
 			}
 			if iNum3 != nil {
 				Num3 = iNum3.(float64)
@@ -75,15 +78,12 @@ func BindViewTable2WithPg(
 			if iNum4 != nil {
 				Num4 = iNum4.(float64)
 			}
-			if iI != nil {
-				I = iI.(int64)
-			}
 
 			results = append(results, ViewTable2{
 				ID:   ID,
+				I:    I,
 				Num3: Num3,
 				Num4: Num4,
-				I:    I,
 			})
 		}
 
