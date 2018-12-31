@@ -29,7 +29,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table1' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS view,
+        TRUE AS primary,
         current_database() AS db
       FROM (
         SELECT
@@ -46,7 +46,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table2' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS view,
+        TRUE AS primary,
         current_database() AS db
       FROM (
         SELECT
@@ -63,11 +63,12 @@ IF TG_OP = 'UPDATE' THEN
         'Table1' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS view,
+        TRUE AS primary,
         current_database() AS db
       FROM (
         SELECT
           NEW."Table1ID" AS "ID",
+          NEW."Table1I" AS "I",
           NEW."Table1Num1" AS "Num1"
       ) t
     ) LOOP
@@ -80,11 +81,12 @@ IF TG_OP = 'UPDATE' THEN
         'Table1' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS view,
+        TRUE AS primary,
         current_database() AS db
       FROM (
         SELECT
           NEW."Table1ID" AS "ID",
+          NEW."Table1I" AS "I",
           NEW."Table1Num2" AS "Num2"
       ) t
     ) LOOP
@@ -97,11 +99,12 @@ IF TG_OP = 'UPDATE' THEN
         'Table2' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS view,
+        TRUE AS primary,
         current_database() AS db
       FROM (
         SELECT
           NEW."Table2ID" AS "ID",
+          NEW."Table2I" AS "I",
           NEW."Table2Num3" AS "Num3"
       ) t
     ) LOOP
@@ -114,11 +117,12 @@ IF TG_OP = 'UPDATE' THEN
         'Table2' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS view,
+        TRUE AS primary,
         current_database() AS db
       FROM (
         SELECT
           NEW."Table2ID" AS "ID",
+          NEW."Table2I" AS "I",
           NEW."Table2Num4" AS "Num4"
       ) t
     ) LOOP
@@ -342,8 +346,8 @@ DECLARE
   c223 double precision=CEIL(RANDOM() * 1000) / 10;
   c224 double precision=CEIL(RANDOM() * 1000) / 10;
 BEGIN
-RAISE NOTICE 'c111=% c112=% c123=% c124=%', c111, c112, c123, c124;
-RAISE NOTICE 'c211=% c212=% c223=% c224=%', c211, c212, c223, c224;
+RAISE NOTICE 'I=% c111=% c112=% c123=% c124=%', i, c111, c112, c123, c124;
+RAISE NOTICE 'I=% c211=% c212=% c223=% c224=%', i, c211, c212, c223, c224;
 UPDATE "ViewSum3"
   SET
     "Table1Num1"=c111,

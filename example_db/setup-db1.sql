@@ -23,7 +23,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table1' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS view,
+        TRUE AS primary,
         current_database() AS db
       FROM (
         SELECT
@@ -40,7 +40,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table1' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS view,
+        TRUE AS primary,
         current_database() AS db
       FROM (
         SELECT
@@ -57,7 +57,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table1' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS view,
+        TRUE AS primary,
         current_database() AS db
       FROM (
         SELECT
@@ -195,7 +195,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table2' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS view,
+        TRUE AS primary,
         current_database() AS db
       FROM (
         SELECT
@@ -212,7 +212,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table2' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS view,
+        TRUE AS primary,
         current_database() AS db
       FROM (
         SELECT
@@ -229,7 +229,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table2' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS view,
+        TRUE AS primary,
         current_database() AS db
       FROM (
         SELECT
