@@ -5,7 +5,7 @@ $$
 DECLARE
   i bigint=0;
 BEGIN
-  WHILE i < 5000 LOOP
+  WHILE i < 3000 LOOP
     i = i + 1;
     PERFORM goahead(i);
   END LOOP;

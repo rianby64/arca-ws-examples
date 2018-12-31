@@ -66,6 +66,7 @@ IF TG_OP = 'UPDATE' THEN
       FROM (
         SELECT
           NEW."Table1ID" AS "ID",
+          NEW."Table1I" AS "I",
           NEW."Table1Num2" AS "Num2"
       ) t
     ) LOOP
@@ -83,6 +84,7 @@ IF TG_OP = 'UPDATE' THEN
       FROM (
         SELECT
           NEW."Table2ID" AS "ID",
+          NEW."Table2I" AS "I",
           NEW."Table2Num4" AS "Num4"
       ) t
     ) LOOP
@@ -285,5 +287,35 @@ CREATE TRIGGER "Table2_notify_viewsum2_after"
   FOR EACH ROW
   EXECUTE PROCEDURE notify_from_table2_viewsum2_after();
 
-DROP TRIGGER IF EXISTS "Table1_notify" ON "Table1";
-DROP TRIGGER IF EXISTS "Table2_notify" ON "Table2";
+/*
+  Delete the databases before running this function.
+  The IDs MUST be equal everywhere
+*/
+CREATE OR REPLACE FUNCTION goahead(i BIGINT)
+  RETURNS VOID
+  LANGUAGE 'plpgsql'
+AS $$
+DECLARE
+  c112 double precision=CEIL(RANDOM() * 1000) / 10;
+  c124 double precision=CEIL(RANDOM() * 1000) / 10;
+  c212 double precision=CEIL(RANDOM() * 1000) / 10;
+  c224 double precision=CEIL(RANDOM() * 1000) / 10;
+BEGIN
+RAISE NOTICE 'I=% c112=% c124=%', i, c112, c124;
+RAISE NOTICE 'I=% c212=% c224=%', i, c212, c224;
+UPDATE "ViewSum2"
+  SET
+    "Table1Num2"=c112,
+    "Table2Num4"=c124,
+    "Table1I"=i,
+    "Table2I"=i
+  WHERE "ID"='1:1';
+UPDATE "ViewSum2"
+  SET
+    "Table1Num2"=c212,
+    "Table2Num4"=c224,
+    "Table1I"=i,
+    "Table2I"=i
+  WHERE "ID"='2:2';
+END;
+$$;

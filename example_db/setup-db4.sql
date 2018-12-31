@@ -325,9 +325,6 @@ CREATE TRIGGER "Table2_notify_viewsum3_after"
   FOR EACH ROW
   EXECUTE PROCEDURE notify_from_table2_viewsum3_after();
 
-DROP TRIGGER IF EXISTS "Table1_notify" ON "Table1";
-DROP TRIGGER IF EXISTS "Table2_notify" ON "Table2";
-
 /*
   Delete the databases before running this function.
   The IDs MUST be equal everywhere
