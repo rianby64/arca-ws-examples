@@ -147,7 +147,7 @@ IF (TG_OP = 'DELETE') THEN
     SELECT
       'ViewSum3' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS resul
+      row_to_json(t) AS result
     FROM (
       SELECT *
         FROM "ViewSum3"
@@ -180,7 +180,7 @@ ELSIF (TG_OP = 'UPDATE') THEN
     SELECT
       'ViewSum3' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS resul
+      row_to_json(t) AS result
     FROM (
       SELECT *
         FROM "ViewSum3"
@@ -195,7 +195,7 @@ ELSIF (TG_OP = 'INSERT') THEN
     SELECT
       'ViewSum3' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS resul
+      row_to_json(t) AS result
     FROM (
       SELECT *
         FROM "ViewSum3"
@@ -222,7 +222,7 @@ IF (TG_OP = 'DELETE') THEN
     SELECT
       'ViewSum3' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS resul
+      row_to_json(t) AS result
     FROM (
       SELECT *
         FROM "ViewSum3"
@@ -255,7 +255,7 @@ ELSIF (TG_OP = 'UPDATE') THEN
     SELECT
       'ViewSum3' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS resul
+      row_to_json(t) AS result
     FROM (
       SELECT *
         FROM "ViewSum3"
@@ -270,7 +270,7 @@ ELSIF (TG_OP = 'INSERT') THEN
     SELECT
       'ViewSum3' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS resul
+      row_to_json(t) AS result
     FROM (
       SELECT *
         FROM "ViewSum3"

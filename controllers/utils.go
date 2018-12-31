@@ -78,9 +78,7 @@ func ConnectNotifyWithArca(
 			}
 
 			var context interface{} = map[string]interface{}{
-				"Source":  notification.Source,
-				"Primary": notification.Primary,
-				"View":    notification.View,
+				"Source": notification.Source,
 			}
 			var response arca.JSONRPCresponse
 
@@ -89,7 +87,6 @@ func ConnectNotifyWithArca(
 			response.Result = notification.Result
 
 			if notification.Primary {
-				log.Println("primary ::", notification)
 				for dbNameContext := range *dbs {
 					request := arca.JSONRPCrequest{}
 					request.Method = notification.Method
@@ -98,24 +95,19 @@ func ConnectNotifyWithArca(
 						"Db":     dbNameContext,
 					}
 					request.Params = notification.Result
-					log.Println("request proc ::", request)
 					s.ProcessRequest(&request)
 				}
-				log.Println("")
 				continue
 			}
 
 			if notification.View {
-				log.Println("view ::", notification)
 				request := arca.JSONRPCrequest{}
 				request.Method = notification.Method
 				request.Context = map[string]interface{}{
 					"Source": notification.Source,
 				}
 				request.Params = notification.Result
-				log.Println("request proc ::", request)
 				s.ProcessRequest(&request)
-				log.Println("")
 				continue
 			}
 

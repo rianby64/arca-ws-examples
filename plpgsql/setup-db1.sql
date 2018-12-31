@@ -83,7 +83,7 @@ IF (TG_OP = 'DELETE') THEN
     SELECT
       'ViewTable1' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS resul
+      row_to_json(t) AS result
     FROM (
       SELECT *
         FROM "ViewTable1"
@@ -116,7 +116,7 @@ ELSIF (TG_OP = 'UPDATE') THEN
     SELECT
       'ViewTable1' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS resul
+      row_to_json(t) AS result
     FROM (
       SELECT *
         FROM "ViewTable1"
@@ -131,7 +131,7 @@ ELSIF (TG_OP = 'INSERT') THEN
     SELECT
       'ViewTable1' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS resul
+      row_to_json(t) AS result
     FROM (
       SELECT *
         FROM "ViewTable1"
@@ -249,7 +249,7 @@ IF (TG_OP = 'DELETE') THEN
     SELECT
       'ViewTable2' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS resul
+      row_to_json(t) AS result
     FROM (
       SELECT *
         FROM "ViewTable2"
@@ -282,7 +282,7 @@ ELSIF (TG_OP = 'UPDATE') THEN
     SELECT
       'ViewTable2' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS resul
+      row_to_json(t) AS result
     FROM (
       SELECT *
         FROM "ViewTable2"
@@ -297,7 +297,7 @@ ELSIF (TG_OP = 'INSERT') THEN
     SELECT
       'ViewTable2' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS resul
+      row_to_json(t) AS result
     FROM (
       SELECT *
         FROM "ViewTable2"
