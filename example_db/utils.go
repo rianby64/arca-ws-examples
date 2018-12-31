@@ -43,7 +43,6 @@ func ConnectNotifyWithArca(
 	type pgNotifyJSONRPC struct {
 		Method  string
 		Source  string
-		Db      string
 		Primary bool
 		View    bool
 		Result  interface{}
@@ -80,7 +79,6 @@ func ConnectNotifyWithArca(
 
 			var context interface{} = map[string]interface{}{
 				"Source":  notification.Source,
-				"Db":      notification.Db,
 				"Primary": notification.Primary,
 				"View":    notification.View,
 			}
@@ -91,7 +89,7 @@ func ConnectNotifyWithArca(
 			response.Result = notification.Result
 
 			if notification.Primary {
-				//log.Println("notification ::", notification)
+				log.Println("primary ::", notification)
 				for dbNameContext := range *dbs {
 					request := arca.JSONRPCrequest{}
 					request.Method = notification.Method
@@ -100,12 +98,27 @@ func ConnectNotifyWithArca(
 						"Db":     dbNameContext,
 					}
 					request.Params = notification.Result
-					//log.Println("request proc ::", request)
+					log.Println("request proc ::", request)
 					s.ProcessRequest(&request)
 				}
-				//log.Println("")
+				log.Println("")
 				continue
 			}
+
+			if notification.View {
+				log.Println("view ::", notification)
+				request := arca.JSONRPCrequest{}
+				request.Method = notification.Method
+				request.Context = map[string]interface{}{
+					"Source": notification.Source,
+				}
+				request.Params = notification.Result
+				log.Println("request proc ::", request)
+				s.ProcessRequest(&request)
+				log.Println("")
+				continue
+			}
+
 			go s.Broadcast(&response)
 		}
 	})()

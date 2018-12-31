@@ -27,8 +27,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table1' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS primary,
-        current_database() AS db
+        TRUE AS primary
       FROM (
         SELECT
           NEW."Table1ID" AS "ID",
@@ -44,8 +43,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table1' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS primary,
-        current_database() AS db
+        TRUE AS primary
       FROM (
         SELECT
           NEW."Table2ID" AS "ID",
@@ -61,8 +59,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table1' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS primary,
-        current_database() AS db
+        TRUE AS primary
       FROM (
         SELECT
           NEW."Table1ID" AS "ID",
@@ -79,8 +76,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table2' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS primary,
-        current_database() AS db
+        TRUE AS primary
       FROM (
         SELECT
           NEW."Table2ID" AS "ID",
@@ -115,8 +111,7 @@ IF (TG_OP = 'DELETE') THEN
     SELECT
       'ViewSum1' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS result,
-      current_database() AS db
+      row_to_json(t) AS resul
     FROM (
       SELECT *
         FROM "ViewSum1"
@@ -149,8 +144,7 @@ ELSIF (TG_OP = 'UPDATE') THEN
     SELECT
       'ViewSum1' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS result,
-      current_database() AS db
+      row_to_json(t) AS resul
     FROM (
       SELECT *
         FROM "ViewSum1"
@@ -165,8 +159,7 @@ ELSIF (TG_OP = 'INSERT') THEN
     SELECT
       'ViewSum1' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS result,
-      current_database() AS db
+      row_to_json(t) AS resul
     FROM (
       SELECT *
         FROM "ViewSum1"
@@ -193,8 +186,7 @@ IF (TG_OP = 'DELETE') THEN
     SELECT
       'ViewSum1' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS result,
-      current_database() AS db
+      row_to_json(t) AS resul
     FROM (
       SELECT *
         FROM "ViewSum1"
@@ -227,8 +219,7 @@ ELSIF (TG_OP = 'UPDATE') THEN
     SELECT
       'ViewSum1' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS result,
-      current_database() AS db
+      row_to_json(t) AS resul
     FROM (
       SELECT *
         FROM "ViewSum1"
@@ -243,8 +234,7 @@ ELSIF (TG_OP = 'INSERT') THEN
     SELECT
       'ViewSum1' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS result,
-      current_database() AS db
+      row_to_json(t) AS resul
     FROM (
       SELECT *
         FROM "ViewSum1"

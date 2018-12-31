@@ -23,8 +23,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table1' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS primary,
-        current_database() AS db
+        TRUE AS primary
       FROM (
         SELECT
           NEW."ID" AS "ID",
@@ -40,8 +39,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table1' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS primary,
-        current_database() AS db
+        TRUE AS primary
       FROM (
         SELECT
           NEW."ID" AS "ID",
@@ -57,8 +55,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table1' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS primary,
-        current_database() AS db
+        TRUE AS primary
       FROM (
         SELECT
           NEW."ID" AS "ID",
@@ -86,8 +83,7 @@ IF (TG_OP = 'DELETE') THEN
     SELECT
       'ViewTable1' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS result,
-      current_database() AS db
+      row_to_json(t) AS resul
     FROM (
       SELECT *
         FROM "ViewTable1"
@@ -120,8 +116,7 @@ ELSIF (TG_OP = 'UPDATE') THEN
     SELECT
       'ViewTable1' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS result,
-      current_database() AS db
+      row_to_json(t) AS resul
     FROM (
       SELECT *
         FROM "ViewTable1"
@@ -136,8 +131,7 @@ ELSIF (TG_OP = 'INSERT') THEN
     SELECT
       'ViewTable1' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS result,
-      current_database() AS db
+      row_to_json(t) AS resul
     FROM (
       SELECT *
         FROM "ViewTable1"
@@ -195,8 +189,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table2' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS primary,
-        current_database() AS db
+        TRUE AS primary
       FROM (
         SELECT
           NEW."ID" AS "ID",
@@ -212,8 +205,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table2' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS primary,
-        current_database() AS db
+        TRUE AS primary
       FROM (
         SELECT
           NEW."ID" AS "ID",
@@ -229,8 +221,7 @@ IF TG_OP = 'UPDATE' THEN
         'Table2' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
-        TRUE AS primary,
-        current_database() AS db
+        TRUE AS primary
       FROM (
         SELECT
           NEW."ID" AS "ID",
@@ -258,8 +249,7 @@ IF (TG_OP = 'DELETE') THEN
     SELECT
       'ViewTable2' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS result,
-      current_database() AS db
+      row_to_json(t) AS resul
     FROM (
       SELECT *
         FROM "ViewTable2"
@@ -292,8 +282,7 @@ ELSIF (TG_OP = 'UPDATE') THEN
     SELECT
       'ViewTable2' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS result,
-      current_database() AS db
+      row_to_json(t) AS resul
     FROM (
       SELECT *
         FROM "ViewTable2"
@@ -308,8 +297,7 @@ ELSIF (TG_OP = 'INSERT') THEN
     SELECT
       'ViewTable2' AS source,
       lower(TG_OP) AS method,
-      row_to_json(t) AS result,
-      current_database() AS db
+      row_to_json(t) AS resul
     FROM (
       SELECT *
         FROM "ViewTable2"
