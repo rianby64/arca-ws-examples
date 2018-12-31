@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	example "./example_db"
+	example "./controllers"
 	arca "github.com/rianby64/arca-ws-jsonrpc"
 )
 
