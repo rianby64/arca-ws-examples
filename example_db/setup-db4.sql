@@ -43,7 +43,7 @@ IF TG_OP = 'UPDATE' THEN
   IF (NEW."Table2I" <> OLD."Table2I") THEN
     FOR r IN (
       SELECT
-        'Table1' AS source,
+        'Table2' AS source,
         lower(TG_OP) AS method,
         row_to_json(t) AS result,
         TRUE AS view,
@@ -350,7 +350,8 @@ UPDATE "ViewSum3"
     "Table1Num2"=c112,
     "Table2Num3"=c123,
     "Table2Num4"=c124,
-    "Table1I"=i
+    "Table1I"=i,
+    "Table2I"=i
   WHERE "ID"='1:1';
 UPDATE "ViewSum3"
   SET
@@ -358,6 +359,7 @@ UPDATE "ViewSum3"
     "Table1Num2"=c212,
     "Table2Num3"=c223,
     "Table2Num4"=c224,
+    "Table1I"=i,
     "Table2I"=i
   WHERE "ID"='2:2';
 END;

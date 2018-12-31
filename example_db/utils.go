@@ -98,11 +98,15 @@ func ConnectNotifyWithArca(
 			}
 			request.Params = notification.Result
 
-			log.Println("notification ::", notification)
+			//log.Println("notification ::", notification)
 			if notification.View {
 				for dbNameContext := range *dbs {
 					request.Context.(map[string]interface{})["Db"] = dbNameContext
-					s.ProcessRequest(&request)
+					requestCopy := arca.JSONRPCrequest{}
+					requestCopy.Method = request.Method
+					requestCopy.Params = request.Params
+					requestCopy.Context = request.Context
+					s.ProcessRequest(&requestCopy)
 				}
 				continue
 			}
