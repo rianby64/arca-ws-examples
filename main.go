@@ -70,12 +70,6 @@ func main() {
 
 	http.Handle("/", http.FileServer(http.Dir("./web/build")))
 	http.HandleFunc("/arca-node", ws.Handle)
-	/*
-		http.HandleFunc("/arca-node", func(w http.ResponseWriter, r *http.Request) {
-			fmt.Printf("Hello, %q", html.EscapeString(r.URL.Path))
-			fmt.Fprintf(w, "Hello, %q", html.EscapeString(r.URL.Path))
-		})
-	*/
 
 	log.Println("Serving :8000")
 	err = http.ListenAndServe(":8000", nil)
