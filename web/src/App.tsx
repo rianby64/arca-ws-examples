@@ -12,4 +12,6 @@ class App extends Component {
   }
 }
 
+new WebSocket("ws://" + document.location.host + "/arca-node");
+
 export default App;
