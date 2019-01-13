@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Table } from 'semantic-ui-react'
-import { any } from 'prop-types';
+import CellArca from './Cell';
 
 export interface IRowArca {
   ID: string,
@@ -15,9 +15,27 @@ class RowArca extends Component<any> {
     return (
       <Table.Row>
         <Table.Cell>{row.ID}</Table.Cell>
-        <Table.Cell>{row.Num1}</Table.Cell>
-        <Table.Cell>{row.Num2}</Table.Cell>
-        <Table.Cell>{row.I}</Table.Cell>
+        <Table.Cell>
+          <CellArca
+            ID={row.ID}
+            value={row.Num1}
+            field='Num1'
+          />
+        </Table.Cell>
+        <Table.Cell>
+          <CellArca
+            ID={row.ID}
+            value={row.Num2}
+            field='Num2'
+          />
+        </Table.Cell>
+        <Table.Cell>
+          <CellArca
+            ID={row.ID}
+            value={row.I}
+            field='I'
+          />
+        </Table.Cell>
       </Table.Row>
     );
   }
