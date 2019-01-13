@@ -23,18 +23,44 @@ class TableArca extends Component {
         Method: 'read',
         ID: `id-for-request-ViewTable1`,
         Context: {
-            Source: 'ViewTable1'
-        }
+          Source: 'ViewTable1',
+        },
       }));
       this.ws.onmessage = (e) => {
-        const rows = JSON.parse(e.data).Result;
-        this.setState({ rows });
+        const response = JSON.parse(e.data);
+        if (response.Context.Source == 'ViewTable1') {
+          if (response.Method == 'read') {
+            const rows = response.Result;
+            this.setState({ rows });
+          } else if (response.Method == 'update') {
+            const rowUpdated = response.Result;
+            this.setState((state: any) => {
+              const rows = state.rows.map((row: any) => {
+                if (row.ID == rowUpdated.ID) {
+                  return rowUpdated;
+                }
+                return row;
+              });
+              return { rows };
+            });
+          }
+        }
       }
     }
   }
 
   updateRow(row: any) {
-    console.log('update row', row);
+    const request = {
+      Method: 'update',
+      Context: {
+        Source: 'ViewTable1',
+      },
+      Params: {
+        ID: row.ID,
+        [row.field]: Number(row.value),
+      },
+    };
+    this.ws.send(JSON.stringify(request));
   }
 
   render() {
