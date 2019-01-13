@@ -11,12 +11,13 @@ export interface IRowArca {
 
 class RowArca extends Component<any> {
   render() {
-    const { row } = this.props;
+    const { row, onRedact } = this.props;
     return (
       <Table.Row>
         <Table.Cell>{row.ID}</Table.Cell>
         <Table.Cell>
           <CellArca
+            onRedact={onRedact}
             ID={row.ID}
             value={row.Num1}
             field='Num1'
@@ -24,6 +25,7 @@ class RowArca extends Component<any> {
         </Table.Cell>
         <Table.Cell>
           <CellArca
+            onRedact={onRedact}
             ID={row.ID}
             value={row.Num2}
             field='Num2'
@@ -31,6 +33,7 @@ class RowArca extends Component<any> {
         </Table.Cell>
         <Table.Cell>
           <CellArca
+            onRedact={onRedact}
             ID={row.ID}
             value={row.I}
             field='I'

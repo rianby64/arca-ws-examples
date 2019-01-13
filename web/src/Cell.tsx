@@ -23,8 +23,10 @@ class CellArca extends Component<any> {
     };
 
     this.beginRedact = this.beginRedact.bind(this);
-    this.submit = this.submit.bind(this);
     this.redact = this.redact.bind(this);
+    this.endRedact = this.endRedact.bind(this);
+
+    this.submit = this.submit.bind(this);
   }
   beginRedact() {
     this.setState({
@@ -42,19 +44,23 @@ class CellArca extends Component<any> {
     this.setState(newState);
   }
 
-  submit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  endRedact() {
     this.setState({
       edit: false,
     });
+  }
 
-    console.log(this.state.cell, 'want to update');
+  submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    this.props.onRedact(this.state.cell);
+    this.endRedact();
   }
 
   render() {
     const { cell: { field, value }, edit } = this.state;
     return edit ?
-      (
+    (
       <Form onSubmit={this.submit}>
         <Form.Input
           onChange={this.redact}
@@ -62,10 +68,10 @@ class CellArca extends Component<any> {
           value={value}
           fluid placeholder={`${field}...`} />
       </Form>
-      ) :
-      (
-      <span onClick={this.beginRedact}>{value}</span>
-      );
+    ) :
+    (
+      <span onClick={this.beginRedact}>{this.props.value}</span>
+    );
   }
 }
 

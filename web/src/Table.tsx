@@ -15,6 +15,8 @@ class TableArca extends Component {
       rows: []
     };
 
+    this.updateRow = this.updateRow.bind(this);
+
     this.ws = new WebSocket("ws://" + document.location.host + "/arca-node");
     this.ws.onopen = () => {
       this.ws.send(JSON.stringify({
@@ -29,6 +31,10 @@ class TableArca extends Component {
         this.setState({ rows });
       }
     }
+  }
+
+  updateRow(row: any) {
+    console.log('update row', row);
   }
 
   render() {
@@ -47,7 +53,11 @@ class TableArca extends Component {
       <Table.Body>
         {
           rows.map(row =>
-            <RowArca key={row.ID} row={row} />
+            <RowArca
+              key={row.ID}
+              row={row}
+              onRedact={this.updateRow}
+            />
           )
         }
       </Table.Body>
