@@ -16,6 +16,7 @@ class TableArca extends Component {
     };
 
     this.updateRow = this.updateRow.bind(this);
+    this.deleteRow = this.deleteRow.bind(this);
 
     this.ws = new WebSocket("ws://" + document.location.host + "/arca-node");
     this.ws.onopen = () => {
@@ -63,6 +64,19 @@ class TableArca extends Component {
     this.ws.send(JSON.stringify(request));
   }
 
+  deleteRow(row: any) {
+    const request = {
+      Method: 'delete',
+      Context: {
+        Source: 'ViewTable1',
+      },
+      Params: {
+        ID: row.ID,
+      },
+    };
+    console.log(request, "to delete");
+  }
+
   render() {
     const { rows } = this.state;
     return (
@@ -73,6 +87,7 @@ class TableArca extends Component {
           <Table.HeaderCell>Num1</Table.HeaderCell>
           <Table.HeaderCell>Num2</Table.HeaderCell>
           <Table.HeaderCell>I</Table.HeaderCell>
+          <Table.HeaderCell></Table.HeaderCell>
         </Table.Row>
       </Table.Header>
 
@@ -83,6 +98,7 @@ class TableArca extends Component {
               key={row.ID}
               row={row}
               onRedact={this.updateRow}
+              onDelete={this.deleteRow}
             />
           )
         }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Table } from 'semantic-ui-react'
+import { Table, Button } from 'semantic-ui-react'
 import CellArca from './Cell';
 
 export interface IRowArca {
@@ -10,11 +10,22 @@ export interface IRowArca {
 };
 
 class RowArca extends Component<any> {
+  constructor(props: any) {
+    super(props);
+
+    this.onDelete = this.onDelete.bind(this);
+  }
+
+  onDelete() {
+    const { row } = this.props;
+    this.props.onDelete(row);
+  }
+
   render() {
     const { row, onRedact } = this.props;
     return (
       <Table.Row>
-        <Table.Cell>{row.ID}</Table.Cell>
+        <Table.Cell collapsing>{row.ID}</Table.Cell>
         <Table.Cell>
           <CellArca
             onRedact={onRedact}
@@ -31,13 +42,16 @@ class RowArca extends Component<any> {
             field='Num2'
           />
         </Table.Cell>
-        <Table.Cell>
+        <Table.Cell collapsing>
           <CellArca
             onRedact={onRedact}
             ID={row.ID}
             value={row.I}
             field='I'
           />
+        </Table.Cell>
+        <Table.Cell collapsing>
+          <Button icon='delete' onClick={this.onDelete} />
         </Table.Cell>
       </Table.Row>
     );
