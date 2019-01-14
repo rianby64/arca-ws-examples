@@ -1,4 +1,4 @@
---\ir ./setup-db-primary.sql;
+\ir ./setup-db-primary.sql;
 
 CREATE OR REPLACE VIEW "ViewTable1" AS (
   SELECT
