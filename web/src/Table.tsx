@@ -38,6 +38,7 @@ class TableArca extends Component {
       this.ws.onmessage = (e) => {
         const response = JSON.parse(e.data);
         if (response.Context.Source == 'ViewTable1') {
+          console.log(response);
           if (response.Method == 'read') {
             const rows = response.Result;
             this.setState({ rows });
@@ -52,25 +53,48 @@ class TableArca extends Component {
               });
               return { rows };
             });
+          } else if (response.Method == 'insert') {
+            console.log('insert');
           }
         }
       }
     }
   }
 
-  createRow(row: any) {
-    console.log('create row', row);
+  createRow(cell: any) {
+    this.setState((state: any) => {
+      const newState = {
+        ...state,
+        newRow: {
+          ...state.newRow,
+          [cell.field]: Number(cell.value),
+        },
+      };
+      const { newRow } = newState;
+
+      if (newRow.Num1 && newRow.Num2) {
+        const request = {
+          Method: 'insert',
+          Context: {
+            Source: 'ViewTable1',
+          },
+          Params: {...newRow, ID: 0},
+        };
+        this.ws.send(JSON.stringify(request));
+      }
+      return newState;
+    });
   }
 
-  updateRow(row: any) {
+  updateRow(cell: any) {
     const request = {
       Method: 'update',
       Context: {
         Source: 'ViewTable1',
       },
       Params: {
-        ID: row.ID,
-        [row.field]: Number(row.value),
+        ID: cell.ID,
+        [cell.field]: Number(cell.value),
       },
     };
     this.ws.send(JSON.stringify(request));
