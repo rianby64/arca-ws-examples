@@ -42,7 +42,7 @@ class RowArca extends Component<any> {
             field='Num2'
           />
         </Table.Cell>
-        <Table.Cell collapsing>
+        <Table.Cell>
           <CellArca
             onRedact={onRedact}
             ID={row.ID}
@@ -51,7 +51,13 @@ class RowArca extends Component<any> {
           />
         </Table.Cell>
         <Table.Cell collapsing>
-          <Button icon='delete' onClick={this.onDelete} />
+        {
+          this.props.onDelete ?
+          (
+            <Button icon='delete' onClick={this.onDelete} />
+          ) :
+          null
+        }
         </Table.Cell>
       </Table.Row>
     );

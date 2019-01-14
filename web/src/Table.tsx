@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import { Table } from 'semantic-ui-react'
+import { Table, Button, Tab } from 'semantic-ui-react'
 import RowArca, { IRowArca } from './Row';
 
 class TableArca extends Component {
   private ws: WebSocket;
   state: {
+    newRow: IRowArca,
     rows: IRowArca[]
   };
 
@@ -12,11 +13,19 @@ class TableArca extends Component {
     super(props);
 
     this.state = {
-      rows: []
+      newRow: {
+        ID: "",
+        Num1: 0,
+        Num2: 0,
+        I: 0,
+      },
+      rows: [],
     };
 
+    this.createRow = this.createRow.bind(this);
     this.updateRow = this.updateRow.bind(this);
     this.deleteRow = this.deleteRow.bind(this);
+    this.prepareAdd = this.prepareAdd.bind(this);
 
     this.ws = new WebSocket("ws://" + document.location.host + "/arca-node");
     this.ws.onopen = () => {
@@ -50,6 +59,10 @@ class TableArca extends Component {
     }
   }
 
+  createRow(row: any) {
+    console.log('create row', row);
+  }
+
   updateRow(row: any) {
     const request = {
       Method: 'update',
@@ -77,11 +90,23 @@ class TableArca extends Component {
     console.log(request, "to delete");
   }
 
+  prepareAdd() {
+    console.log('add a new empty row');
+  }
+
   render() {
-    const { rows } = this.state;
+    const { rows, newRow } = this.state;
     return (
     <Table celled>
       <Table.Header>
+        <Table.Row>
+          <Table.HeaderCell colSpan="5">
+            <Button
+              icon='add'
+              onClick={this.prepareAdd}
+            />
+          </Table.HeaderCell>
+        </Table.Row>
         <Table.Row>
           <Table.HeaderCell>ID</Table.HeaderCell>
           <Table.HeaderCell>Num1</Table.HeaderCell>
@@ -102,6 +127,11 @@ class TableArca extends Component {
             />
           )
         }
+        <RowArca
+          key={newRow.ID}
+          row={newRow}
+          onRedact={this.createRow}
+        />
       </Table.Body>
     </Table>
     );
