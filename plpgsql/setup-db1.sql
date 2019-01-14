@@ -16,6 +16,22 @@ AS $$
 DECLARE
   r RECORD;
 BEGIN
+IF TG_OP = 'DELETE' THEN
+  FOR r IN (
+    SELECT
+      'Table1' AS source,
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      TRUE AS primary
+    FROM (
+      SELECT
+        NEW."ID" AS "ID"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
+  RETURN OLD;
+END IF;
 IF TG_OP = 'UPDATE' THEN
   IF (NEW."I" <> OLD."I") THEN
     FOR r IN (
@@ -65,6 +81,24 @@ IF TG_OP = 'UPDATE' THEN
       PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
     END LOOP;
   END IF;
+  RETURN NEW;
+END IF;
+IF TG_OP = 'INSERT' THEN
+  FOR r IN (
+    SELECT
+      'Table1' AS source,
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      TRUE AS primary
+    FROM (
+      SELECT
+        NEW."Num1" AS "Num1",
+        NEW."Num2" AS "Num2",
+        NEW."I" AS "I"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
   RETURN NEW;
 END IF;
 RETURN NULL;
@@ -182,6 +216,22 @@ AS $$
 DECLARE
   r RECORD;
 BEGIN
+IF TG_OP = 'DELETE' THEN
+  FOR r IN (
+    SELECT
+      'Table2' AS source,
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      TRUE AS primary
+    FROM (
+      SELECT
+        NEW."ID" AS "ID"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
+  RETURN OLD;
+END IF;
 IF TG_OP = 'UPDATE' THEN
   IF (NEW."I" <> OLD."I") THEN
     FOR r IN (
@@ -231,6 +281,24 @@ IF TG_OP = 'UPDATE' THEN
       PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
     END LOOP;
   END IF;
+  RETURN NEW;
+END IF;
+IF TG_OP = 'INSERT' THEN
+  FOR r IN (
+    SELECT
+      'Table2' AS source,
+      lower(TG_OP) AS method,
+      row_to_json(t) AS result,
+      TRUE AS primary
+    FROM (
+      SELECT
+        NEW."Num3" AS "Num3",
+        NEW."Num4" AS "Num4",
+        NEW."I" AS "I"
+    ) t
+  ) LOOP
+    PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
+  END LOOP;
   RETURN NEW;
 END IF;
 RETURN NULL;
