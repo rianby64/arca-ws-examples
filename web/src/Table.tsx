@@ -55,7 +55,15 @@ class TableArca extends Component {
           } else if (response.Method == 'insert') {
             console.log(response, 'insert');
           } else if (response.Method == 'delete') {
-            console.log(response, 'delete');
+            const rowDeleted = response.Result;
+            this.setState((state: any) => {
+              const rows = state.rows.map((row: any) => {
+                if (row.ID !== rowDeleted.ID) {
+                  return row;
+                }
+              }).filter((row: any) => row !== undefined);
+              return { rows };
+            });
           }
         }
       }
