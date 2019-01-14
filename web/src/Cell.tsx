@@ -1,5 +1,4 @@
 import React, { Component, ChangeEvent, FormEvent } from 'react'
-import { Form } from 'semantic-ui-react'
 
 class CellArca extends Component<any> {
   state: {
@@ -61,13 +60,13 @@ class CellArca extends Component<any> {
     const { cell: { field, value }, edit } = this.state;
     return edit ?
     (
-      <Form onSubmit={this.submit}>
-        <Form.Input
+      <form onSubmit={this.submit}>
+        <input
           onChange={this.redact}
           name={field}
           value={value}
-          fluid placeholder={`${field}...`} />
-      </Form>
+          placeholder={`${field}...`} />
+      </form>
     ) :
     (
       <span onClick={this.beginRedact}>{this.props.value}</span>

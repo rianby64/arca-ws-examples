@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { Table, Button } from 'semantic-ui-react'
 import CellArca from './Cell';
 
 export interface IRowArca {
@@ -24,42 +23,42 @@ class RowArca extends Component<any> {
   render() {
     const { row, onRedact } = this.props;
     return (
-      <Table.Row>
-        <Table.Cell collapsing>{row.ID}</Table.Cell>
-        <Table.Cell>
+      <tr>
+        <td>{row.ID}</td>
+        <td>
           <CellArca
             onRedact={onRedact}
             ID={row.ID}
             value={row.Num1}
             field='Num1'
           />
-        </Table.Cell>
-        <Table.Cell>
+        </td>
+        <td>
           <CellArca
             onRedact={onRedact}
             ID={row.ID}
             value={row.Num2}
             field='Num2'
           />
-        </Table.Cell>
-        <Table.Cell>
+        </td>
+        <td>
           <CellArca
             onRedact={onRedact}
             ID={row.ID}
             value={row.I}
             field='I'
           />
-        </Table.Cell>
-        <Table.Cell collapsing>
-        {
-          this.props.onDelete ?
-          (
-            <Button icon='delete' onClick={this.onDelete} />
-          ) :
-          null
-        }
-        </Table.Cell>
-      </Table.Row>
+        </td>
+        <td>
+          {
+            this.props.onDelete ?
+            (
+              <button onClick={this.onDelete} >X</button>
+            ) :
+            null
+          }
+        </td>
+      </tr>
     );
   }
 }

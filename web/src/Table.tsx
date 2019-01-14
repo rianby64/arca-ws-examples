@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import { Table, Button, Tab } from 'semantic-ui-react'
 import RowArca, { IRowArca } from './Row';
 
 class TableArca extends Component {
@@ -125,18 +124,18 @@ class TableArca extends Component {
   render() {
     const { rows, newRow } = this.state;
     return (
-    <Table celled>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>ID</Table.HeaderCell>
-          <Table.HeaderCell>Num1</Table.HeaderCell>
-          <Table.HeaderCell>Num2</Table.HeaderCell>
-          <Table.HeaderCell>I</Table.HeaderCell>
-          <Table.HeaderCell></Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
+    <table>
+      <thead>
+        <tr>
+          <td>ID</td>
+          <td>Num1</td>
+          <td>Num2</td>
+          <td>I</td>
+          <td></td>
+        </tr>
+      </thead>
 
-      <Table.Body>
+      <tbody>
         {
           rows.map(row =>
             <RowArca
@@ -152,8 +151,8 @@ class TableArca extends Component {
           row={newRow}
           onRedact={this.createRow}
         />
-      </Table.Body>
-    </Table>
+      </tbody>
+    </table>
     );
   }
 }
