@@ -38,7 +38,6 @@ class TableArca extends Component {
       this.ws.onmessage = (e) => {
         const response = JSON.parse(e.data);
         if (response.Context.Source == 'ViewTable1') {
-          console.log(response);
           if (response.Method == 'read') {
             const rows = response.Result;
             this.setState({ rows });
@@ -54,7 +53,9 @@ class TableArca extends Component {
               return { rows };
             });
           } else if (response.Method == 'insert') {
-            console.log('insert');
+            console.log(response, 'insert');
+          } else if (response.Method == 'delete') {
+            console.log(response, 'delete');
           }
         }
       }
@@ -100,17 +101,17 @@ class TableArca extends Component {
     this.ws.send(JSON.stringify(request));
   }
 
-  deleteRow(row: any) {
+  deleteRow(cell: any) {
     const request = {
       Method: 'delete',
       Context: {
         Source: 'ViewTable1',
       },
       Params: {
-        ID: row.ID,
+        ID: cell.ID,
       },
     };
-    console.log(request, "to delete");
+    this.ws.send(JSON.stringify(request));
   }
 
   render() {
