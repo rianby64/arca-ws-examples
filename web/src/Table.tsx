@@ -25,7 +25,6 @@ class TableArca extends Component {
     this.createRow = this.createRow.bind(this);
     this.updateRow = this.updateRow.bind(this);
     this.deleteRow = this.deleteRow.bind(this);
-    this.prepareAdd = this.prepareAdd.bind(this);
 
     this.ws = new WebSocket("ws://" + document.location.host + "/arca-node");
     this.ws.onopen = () => {
@@ -90,23 +89,11 @@ class TableArca extends Component {
     console.log(request, "to delete");
   }
 
-  prepareAdd() {
-    console.log('add a new empty row');
-  }
-
   render() {
     const { rows, newRow } = this.state;
     return (
     <Table celled>
       <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell colSpan="5">
-            <Button
-              icon='add'
-              onClick={this.prepareAdd}
-            />
-          </Table.HeaderCell>
-        </Table.Row>
         <Table.Row>
           <Table.HeaderCell>ID</Table.HeaderCell>
           <Table.HeaderCell>Num1</Table.HeaderCell>
