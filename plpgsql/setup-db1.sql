@@ -1,4 +1,4 @@
-\ir ./setup-db-primary.sql;
+--\ir ./setup-db-primary.sql;
 
 CREATE OR REPLACE VIEW "ViewTable1" AS (
   SELECT
@@ -25,7 +25,7 @@ IF TG_OP = 'DELETE' THEN
       TRUE AS primary
     FROM (
       SELECT
-        NEW."ID" AS "ID"
+        OLD."ID" AS "ID"
     ) t
   ) LOOP
     PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
@@ -225,7 +225,7 @@ IF TG_OP = 'DELETE' THEN
       TRUE AS primary
     FROM (
       SELECT
-        NEW."ID" AS "ID"
+        OLD."ID" AS "ID"
     ) t
   ) LOOP
     PERFORM pg_notify('jsonrpc', row_to_json(r)::text);
