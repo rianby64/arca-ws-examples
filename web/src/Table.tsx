@@ -2,76 +2,27 @@ import React, { Component } from 'react'
 import RowArca, { IRowArca } from './Row';
 
 class TableArca extends Component<any> {
-  private ws: WebSocket;
-  state: {
-    rows: IRowArca[]
-  };
-
   constructor(props: any) {
     super(props);
-
-    this.state = {
-      rows: [],
-    };
-
-    this.createRow = this.createRow.bind(this);
-    this.updateRow = this.updateRow.bind(this);
-    this.deleteRow = this.deleteRow.bind(this);
-
-    this.ws = new WebSocket("ws://" + document.location.host + "/arca-node");
-    this.ws.onopen = () => {
-      this.ws.send(JSON.stringify({
-        Method: 'read',
-        ID: `id-for-request-ViewTable1`,
-        Context: {
-          Source: 'ViewTable1',
-        },
-      }));
-      this.ws.onmessage = (e) => {
-        const response = JSON.parse(e.data);
-        if (response.Context.Source == 'ViewTable1') {
-          if (response.Method == 'read') {
-            const rows = response.Result;
-            this.setState({ rows });
-          } else if (response.Method == 'update') {
-            const rowUpdated = response.Result;
-            this.setState((state: any) => {
-              const rows = state.rows.map((row: any) => {
-                if (row.ID == rowUpdated.ID) {
-                  return rowUpdated;
-                }
-                return row;
-              });
-              return { rows };
-            });
-          } else if (response.Method == 'insert') {
-            const rowInserted = response.Result;
-            this.setState((state: any) => {
-              const rows = state.rows;
-              rows.push(rowInserted);
-              return { rows };
-            });
-          } else if (response.Method == 'delete') {
-            const rowDeleted = response.Result;
-            this.setState((state: any) => {
-              const rows = state.rows.filter((row: any) => {
-                if (row.ID !== rowDeleted.ID) {
-                  return row;
-                }
-              });
-              return { rows };
-            });
-          }
-        }
-      }
-    }
   }
 
   componentDidMount() {
     this.props.getRequestMethod(this.createRow);
+    this.readRows();
   }
 
-  createRow(row: any) {
+  readRows = () => {
+    const request = {
+      Method: 'read',
+      ID: `id-for-request-ViewTable1`,
+      Context: {
+        Source: 'ViewTable1',
+      },
+    };
+    this.props.send(request);
+  }
+
+  createRow = (row: any) => {
     const request = {
       Method: 'insert',
       Context: {
@@ -79,10 +30,10 @@ class TableArca extends Component<any> {
       },
       Params: {...row, ID: ''},
     };
-    this.ws.send(JSON.stringify(request));
+    this.props.send(request);
   }
 
-  updateRow(cell: any) {
+  updateRow = (cell: any) => {
     const request = {
       Method: 'update',
       Context: {
@@ -93,10 +44,10 @@ class TableArca extends Component<any> {
         [cell.field]: Number(cell.value),
       },
     };
-    this.ws.send(JSON.stringify(request));
+    this.props.send(request);
   }
 
-  deleteRow(cell: any) {
+  deleteRow = (cell: any) => {
     const request = {
       Method: 'delete',
       Context: {
@@ -106,11 +57,11 @@ class TableArca extends Component<any> {
         ID: cell.ID,
       },
     };
-    this.ws.send(JSON.stringify(request));
+    this.props.send(request);
   }
 
   render() {
-    const { rows } = this.state;
+    const { rows } = this.props;
     return (
     <table>
       <thead>
@@ -125,7 +76,7 @@ class TableArca extends Component<any> {
 
       <tbody>
         {
-          rows.map(row =>
+          rows.map((row: any) =>
             <RowArca
               key={row.ID}
               row={row}
