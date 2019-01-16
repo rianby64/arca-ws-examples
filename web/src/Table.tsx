@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import RowArca, { IRowArca } from './Row';
+import RowArca from './Row';
 
 class TableArca extends Component<any> {
   constructor(props: any) {
@@ -14,9 +14,9 @@ class TableArca extends Component<any> {
   readRows = () => {
     const request = {
       Method: 'read',
-      ID: `id-for-request-ViewTable1`,
+      ID: `id-for-request`,
       Context: {
-        Source: 'ViewTable1',
+        Source: this.props.source,
       },
     };
     this.props.send(request);
@@ -26,7 +26,7 @@ class TableArca extends Component<any> {
     const request = {
       Method: 'insert',
       Context: {
-        Source: 'ViewTable1',
+        Source: this.props.source,
       },
       Params: {...row, ID: ''},
     };
@@ -37,7 +37,7 @@ class TableArca extends Component<any> {
     const request = {
       Method: 'update',
       Context: {
-        Source: 'ViewTable1',
+        Source: this.props.source,
       },
       Params: {
         ID: cell.ID,
@@ -51,7 +51,7 @@ class TableArca extends Component<any> {
     const request = {
       Method: 'delete',
       Context: {
-        Source: 'ViewTable1',
+        Source: this.props.source,
       },
       Params: {
         ID: cell.ID,
@@ -61,15 +61,15 @@ class TableArca extends Component<any> {
   }
 
   render() {
-    const { rows } = this.props;
+    const { rows, headers } = this.props;
     return (
     <table>
       <thead>
         <tr>
-          <td>ID</td>
-          <td>Num1</td>
-          <td>Num2</td>
-          <td>I</td>
+          { headers.map((header: any, index: number) => (
+              <td key={index}>{header}</td>
+            ))
+          }
           <td></td>
         </tr>
       </thead>
@@ -78,6 +78,7 @@ class TableArca extends Component<any> {
         {
           rows.map((row: any) =>
             <RowArca
+              fields={this.props.fields}
               key={row.ID}
               row={row}
               onRedact={this.updateRow}

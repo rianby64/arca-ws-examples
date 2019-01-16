@@ -34,53 +34,55 @@ class App extends Component {
       this.wsConnected = true;
       this.ws.onmessage = (e) => {
         const response = JSON.parse(e.data);
-        if (response.Context.Source == 'ViewTable1') {
+        const source = response.Context.Source;
           if (response.Method == 'read') {
-            const ViewTable1 = response.Result;
+            const rows = response.Result;
             this.setState((state: any) => {
               return {
                 ...state,
-                ViewTable1,
+                [source]: rows,
               }
             });
           } else if (response.Method == 'update') {
             const rowUpdated = response.Result;
             this.setState((state: any) => {
-              const ViewTable1 = state.ViewTable1.map((row: any) => {
-                if (row.ID == rowUpdated.ID) {
-                  return rowUpdated;
-                }
-                return row;
-              });
+              const rows = state[source];
+              if (!rows) return state;
               return {
                 ...state,
-                ViewTable1,
+                [source]: rows.map((row: any) => {
+                  if (row.ID == rowUpdated.ID) {
+                    return rowUpdated;
+                  }
+                  return row;
+                }),
               };
             });
           } else if (response.Method == 'insert') {
             const rowInserted = response.Result;
             this.setState((state: any) => {
-              const { ViewTable1 } = state;
+              const rows = state[source];
+              if (!rows) return state;
               return {
                 ...state,
-                ViewTable1: [...ViewTable1, rowInserted]
+                [source]: [...rows, rowInserted]
               };
             });
           } else if (response.Method == 'delete') {
             const rowDeleted = response.Result;
             this.setState((state: any) => {
-              const ViewTable1 = state.ViewTable1.filter((row: any) => {
-                if (row.ID !== rowDeleted.ID) {
-                  return row;
-                }
-              });
+              const rows = state[source];
+              if (!rows) return state;
               return {
                 ...state,
-                ViewTable1
+                [source]: rows.filter((row: any) => {
+                  if (row.ID !== rowDeleted.ID) {
+                    return row;
+                  }
+                })
               };
             });
-          }
-        }
+          };
       };
       this.requests.forEach(request => {
         this.sendRequest(request);
@@ -124,7 +126,10 @@ class App extends Component {
         <TableArca
           getRequestMethod={this.getRequestMethod}
           rows={this.state.ViewTable1}
+          headers={['ID', 'Num1', 'Num2', 'I']}
+          fields={['Num1', 'Num2', 'I']}
           send={this.sendRequest}
+          source="ViewTable1"
         />
         { this.state.modal ?
           <Modal
