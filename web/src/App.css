@@ -7,3 +7,26 @@ td {
   border: 1px solid #cfcfcf;
   padding: 0px 3px;
 }
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal form {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  padding: 10px;
+}
+
+.modal form *:not(label) {
+  margin: 0 0 10px;
+}

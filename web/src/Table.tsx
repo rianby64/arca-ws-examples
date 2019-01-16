@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
 import RowArca, { IRowArca } from './Row';
 
-class TableArca extends Component {
+class TableArca extends Component<any> {
   private ws: WebSocket;
   state: {
-    newRow: IRowArca,
     rows: IRowArca[]
   };
 
@@ -12,12 +11,6 @@ class TableArca extends Component {
     super(props);
 
     this.state = {
-      newRow: {
-        ID: "",
-        Num1: 0,
-        Num2: 0,
-        I: 0,
-      },
       rows: [],
     };
 
@@ -52,7 +45,12 @@ class TableArca extends Component {
               return { rows };
             });
           } else if (response.Method == 'insert') {
-            console.log(response, 'insert');
+            const rowInserted = response.Result;
+            this.setState((state: any) => {
+              const rows = state.rows;
+              rows.push(rowInserted);
+              return { rows };
+            });
           } else if (response.Method == 'delete') {
             const rowDeleted = response.Result;
             this.setState((state: any) => {
@@ -69,29 +67,19 @@ class TableArca extends Component {
     }
   }
 
-  createRow(cell: any) {
-    this.setState((state: any) => {
-      const newState = {
-        ...state,
-        newRow: {
-          ...state.newRow,
-          [cell.field]: Number(cell.value),
-        },
-      };
-      const { newRow } = newState;
+  componentDidMount() {
+    this.props.getRequestMethod(this.createRow);
+  }
 
-      if (newRow.Num1 && newRow.Num2) {
-        const request = {
-          Method: 'insert',
-          Context: {
-            Source: 'ViewTable1',
-          },
-          Params: {...newRow, ID: 0},
-        };
-        this.ws.send(JSON.stringify(request));
-      }
-      return newState;
-    });
+  createRow(row: any) {
+    const request = {
+      Method: 'insert',
+      Context: {
+        Source: 'ViewTable1',
+      },
+      Params: {...row, ID: ''},
+    };
+    this.ws.send(JSON.stringify(request));
   }
 
   updateRow(cell: any) {
@@ -122,7 +110,7 @@ class TableArca extends Component {
   }
 
   render() {
-    const { rows, newRow } = this.state;
+    const { rows } = this.state;
     return (
     <table>
       <thead>
@@ -146,11 +134,6 @@ class TableArca extends Component {
             />
           )
         }
-        <RowArca
-          key={newRow.ID}
-          row={newRow}
-          onRedact={this.createRow}
-        />
       </tbody>
     </table>
     );
