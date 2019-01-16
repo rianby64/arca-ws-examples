@@ -9,6 +9,7 @@ class App extends Component {
     modal: boolean,
     request: any,
     ViewTable1: any[],
+    ViewTable2: any[],
   };
 
   private ws: WebSocket;
@@ -21,6 +22,7 @@ class App extends Component {
       modal: false,
       request: {},
       ViewTable1: [],
+      ViewTable2: [],
     };
     this.requests = [];
     this.wsConnected = false;
@@ -35,54 +37,54 @@ class App extends Component {
       this.ws.onmessage = (e) => {
         const response = JSON.parse(e.data);
         const source = response.Context.Source;
-          if (response.Method == 'read') {
-            const rows = response.Result;
-            this.setState((state: any) => {
-              return {
-                ...state,
-                [source]: rows,
-              }
-            });
-          } else if (response.Method == 'update') {
-            const rowUpdated = response.Result;
-            this.setState((state: any) => {
-              const rows = state[source];
-              if (!rows) return state;
-              return {
-                ...state,
-                [source]: rows.map((row: any) => {
-                  if (row.ID == rowUpdated.ID) {
-                    return rowUpdated;
-                  }
+        if (response.Method == 'read') {
+          const rows = response.Result;
+          this.setState((state: any) => {
+            return {
+              ...state,
+              [source]: rows,
+            }
+          });
+        } else if (response.Method == 'update') {
+          const rowUpdated = response.Result;
+          this.setState((state: any) => {
+            const rows = state[source];
+            if (!rows) return state;
+            return {
+              ...state,
+              [source]: rows.map((row: any) => {
+                if (row.ID == rowUpdated.ID) {
+                  return rowUpdated;
+                }
+                return row;
+              }),
+            };
+          });
+        } else if (response.Method == 'insert') {
+          const rowInserted = response.Result;
+          this.setState((state: any) => {
+            const rows = state[source];
+            if (!rows) return state;
+            return {
+              ...state,
+              [source]: [...rows, rowInserted]
+            };
+          });
+        } else if (response.Method == 'delete') {
+          const rowDeleted = response.Result;
+          this.setState((state: any) => {
+            const rows = state[source];
+            if (!rows) return state;
+            return {
+              ...state,
+              [source]: rows.filter((row: any) => {
+                if (row.ID !== rowDeleted.ID) {
                   return row;
-                }),
-              };
-            });
-          } else if (response.Method == 'insert') {
-            const rowInserted = response.Result;
-            this.setState((state: any) => {
-              const rows = state[source];
-              if (!rows) return state;
-              return {
-                ...state,
-                [source]: [...rows, rowInserted]
-              };
-            });
-          } else if (response.Method == 'delete') {
-            const rowDeleted = response.Result;
-            this.setState((state: any) => {
-              const rows = state[source];
-              if (!rows) return state;
-              return {
-                ...state,
-                [source]: rows.filter((row: any) => {
-                  if (row.ID !== rowDeleted.ID) {
-                    return row;
-                  }
-                })
-              };
-            });
-          };
+                }
+              })
+            };
+          });
+        }
       };
       this.requests.forEach(request => {
         this.sendRequest(request);
@@ -130,6 +132,14 @@ class App extends Component {
           fields={['Num1', 'Num2', 'I']}
           send={this.sendRequest}
           source="ViewTable1"
+        />
+        <TableArca
+          getRequestMethod={this.getRequestMethod}
+          rows={this.state.ViewTable2}
+          headers={['ID', 'Num3', 'Num4', 'I']}
+          fields={['Num3', 'Num4', 'I']}
+          send={this.sendRequest}
+          source="ViewTable2"
         />
         { this.state.modal ?
           <Modal
