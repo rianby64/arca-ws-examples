@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import TableArca from './Table';
-import Buttom from './Button';
+import Button from './Button';
 import Modal from './Modal';
 
 class App extends Component {
@@ -124,7 +124,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Buttom openModal={this.modalSwitcher} />
+        <Button openModal={this.modalSwitcher} />
         <TableArca
           getRequestMethod={this.getRequestMethod}
           rows={this.state.ViewTable1}
