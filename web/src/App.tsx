@@ -6,8 +6,9 @@ import Modal from './Modal';
 
 class App extends Component {
   state: {
-    modal: boolean,
+    modal: string,
     request: any,
+    tables: any,
     ViewTable1: any[],
     ViewTable2: any[],
   };
@@ -19,8 +20,22 @@ class App extends Component {
   constructor(props: any) {
     super(props);
     this.state = {
-      modal: false,
+      modal: '',
       request: {},
+      tables: [
+        {
+          source: 'ViewTable1',
+          rows: [],
+          fields: ['Num1', 'Num2', 'I'],
+          headers: ['ID', 'Num1', 'Num2', 'I'],
+        },
+        {
+          source: 'ViewTable2',
+          rows: [],
+          fields: ['Num3', 'Num4', 'I'],
+          headers: ['ID', 'Num3', 'Num4', 'I'],
+        },
+      ],
       ViewTable1: [],
       ViewTable2: [],
     };
@@ -101,10 +116,10 @@ class App extends Component {
     }
   }
 
-  modalSwitcher() {
-    this.setState((state: any) => {
+  modalSwitcher(table: string) {
+    this.setState(() => {
       const newState = {
-        modal: !state.modal,
+        modal: table,
       };
 
       return newState;
@@ -124,27 +139,30 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Button openModal={this.modalSwitcher} />
+        <Button openModal={this.modalSwitcher} table="ViewTable1" />
+        <Button openModal={this.modalSwitcher} table="ViewTable2" />
         <TableArca
           getRequestMethod={this.getRequestMethod}
           rows={this.state.ViewTable1}
-          headers={['ID', 'Num1', 'Num2', 'I']}
-          fields={['Num1', 'Num2', 'I']}
+          headers={this.state.tables[0].headers}
+          fields={this.state.tables[0].fields}
           send={this.sendRequest}
-          source="ViewTable1"
+          source={this.state.tables[0].source}
         />
         <TableArca
           getRequestMethod={this.getRequestMethod}
           rows={this.state.ViewTable2}
-          headers={['ID', 'Num3', 'Num4', 'I']}
-          fields={['Num3', 'Num4', 'I']}
+          headers={this.state.tables[1].headers}
+          fields={this.state.tables[1].fields}
           send={this.sendRequest}
-          source="ViewTable2"
+          source={this.state.tables[1].source}
         />
         { this.state.modal ?
           <Modal
             closeModal={this.modalSwitcher}
             request={this.state.request}
+            table={this.state.modal}
+            tablesData={this.state.tables}
           /> :
           null
         }

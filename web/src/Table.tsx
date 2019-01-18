@@ -22,11 +22,11 @@ class TableArca extends Component<any> {
     this.props.send(request);
   }
 
-  createRow = (row: any) => {
+  createRow = (row: any, table: string) => {
     const request = {
       Method: 'insert',
       Context: {
-        Source: this.props.source,
+        Source: table,
       },
       Params: {...row, ID: ''},
     };
