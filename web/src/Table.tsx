@@ -1,13 +1,20 @@
 import React, { Component } from 'react'
 import RowArca from './Row';
+import Modal from './Modal';
 
 class TableArca extends Component<any> {
+  state = {
+    newRow: {},
+  };
+
   constructor(props: any) {
     super(props);
+    this.state = {
+      newRow: {},
+    };
   }
 
   componentDidMount() {
-    this.props.getRequestMethod(this.createRow);
     this.readRows();
   }
 
@@ -22,11 +29,11 @@ class TableArca extends Component<any> {
     this.props.send(request);
   }
 
-  createRow = (row: any, table: string) => {
+  createRow = (row: any) => {
     const request = {
       Method: 'insert',
       Context: {
-        Source: table,
+        Source: this.props.source,
       },
       Params: {...row, ID: ''},
     };
@@ -63,31 +70,38 @@ class TableArca extends Component<any> {
   render() {
     const { rows, headers } = this.props;
     return (
-    <table>
-      <thead>
-        <tr>
-          { headers.map((header: any, index: number) => (
-              <td key={index}>{header}</td>
-            ))
+    <div>
+      <Modal
+        title={this.props.source}
+        fields={this.props.fields}
+        row={this.state.newRow}
+        onSubmit={this.createRow}
+      />
+      <table>
+        <thead>
+          <tr>
+            { headers.map((header: any, index: number) => (
+                <th key={index}>{header}</th>
+              ))
+            }
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((row: any) =>
+              <RowArca
+                fields={this.props.fields}
+                key={row.ID}
+                row={row}
+                onRedact={this.updateRow}
+                onDelete={this.deleteRow}
+              />
+            )
           }
-          <td></td>
-        </tr>
-      </thead>
-
-      <tbody>
-        {
-          rows.map((row: any) =>
-            <RowArca
-              fields={this.props.fields}
-              key={row.ID}
-              row={row}
-              onRedact={this.updateRow}
-              onDelete={this.deleteRow}
-            />
-          )
-        }
-      </tbody>
-    </table>
+        </tbody>
+      </table>
+    </div>
     );
   }
 }

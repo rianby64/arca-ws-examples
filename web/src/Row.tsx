@@ -32,7 +32,7 @@ class RowArca extends Component<any> {
           {
             this.props.onDelete ?
             (
-              <button onClick={this.onDelete} >X</button>
+              <button onClick={this.onDelete}>X</button>
             ) :
             null
           }

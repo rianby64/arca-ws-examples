@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
 import TableArca from './Table';
-import Button from './Button';
-import Modal from './Modal';
 
 class App extends Component {
   state: {
-    modal: string,
-    request: any,
     tables: any,
     ViewTable1: any[],
     ViewTable2: any[],
@@ -20,8 +16,6 @@ class App extends Component {
   constructor(props: any) {
     super(props);
     this.state = {
-      modal: '',
-      request: {},
       tables: [
         {
           source: 'ViewTable1',
@@ -41,10 +35,6 @@ class App extends Component {
     };
     this.requests = [];
     this.wsConnected = false;
-
-    this.modalSwitcher = this.modalSwitcher.bind(this);
-    this.getRequestMethod = this.getRequestMethod.bind(this);
-    this.sendRequest = this.sendRequest.bind(this);
 
     this.ws = new WebSocket("ws://" + document.location.host + "/arca-node");
     this.ws.onopen = () => {
@@ -108,7 +98,7 @@ class App extends Component {
     };
   };
 
-  sendRequest(request: any) {
+  sendRequest = (request: any) => {
     if (this.wsConnected) {
       this.ws.send(JSON.stringify(request));
     } else {
@@ -116,33 +106,10 @@ class App extends Component {
     }
   }
 
-  modalSwitcher(table: string) {
-    this.setState(() => {
-      const newState = {
-        modal: table,
-      };
-
-      return newState;
-    });
-  };
-
-  getRequestMethod(method: object) {
-    this.setState(() => {
-      const newState = {
-        request: method,
-      };
-
-      return newState;
-    });
-  };
-
   render() {
     return (
       <div className="App">
-        <Button openModal={this.modalSwitcher} table="ViewTable1" />
-        <Button openModal={this.modalSwitcher} table="ViewTable2" />
         <TableArca
-          getRequestMethod={this.getRequestMethod}
           rows={this.state.ViewTable1}
           headers={this.state.tables[0].headers}
           fields={this.state.tables[0].fields}
@@ -150,22 +117,12 @@ class App extends Component {
           source={this.state.tables[0].source}
         />
         <TableArca
-          getRequestMethod={this.getRequestMethod}
           rows={this.state.ViewTable2}
           headers={this.state.tables[1].headers}
           fields={this.state.tables[1].fields}
           send={this.sendRequest}
           source={this.state.tables[1].source}
         />
-        { this.state.modal ?
-          <Modal
-            closeModal={this.modalSwitcher}
-            request={this.state.request}
-            table={this.state.modal}
-            tablesData={this.state.tables}
-          /> :
-          null
-        }
       </div>
     );
   };
